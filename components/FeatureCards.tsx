@@ -11,7 +11,7 @@ export default function FeatureCards() {
         "Results in 3–5 days",
         "Private online dashboard"
       ],
-      cta: { label: "Order now", href: "/product/testosterone" }
+      cta: { label: "Order now — $89", href: "/product/1" }
     },
     {
       title: "Stress & Energy Kit",
@@ -22,7 +22,18 @@ export default function FeatureCards() {
         "Lab-grade analysis",
         "Actionable insights"
       ],
-      cta: { label: "Order now", href: "/product/stress-energy" }
+      cta: { label: "Order now — $99", href: "/product/2" }
+    },
+    {
+      title: "Complete Hormone Panel",
+      desc: "Comprehensive testing for testosterone, cortisol, and DHEA.",
+      image: "/testkit.png",
+      bullets: [
+        "Tests all major hormones",
+        "Comprehensive analysis",
+        "Expert consultation included"
+      ],
+      cta: { label: "Order now — $149", href: "/product/3" }
     }
   ]
 
@@ -49,7 +60,7 @@ export default function FeatureCards() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {cards.map((card, index) => (
             <div
               key={index}
