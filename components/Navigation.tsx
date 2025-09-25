@@ -31,14 +31,14 @@ export default function Navigation() {
               </button>
               <div className="absolute top-full left-0 mt-2 w-48 bg-bg-card rounded-xl border border-white/10 shadow-soft opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="p-2">
-                  <a href="/product/testosterone" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                  <a href="/product/1" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                     Testosterone Kit
                   </a>
-                  <a href="/product/stress-energy" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                  <a href="/product/2" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                     Stress & Energy Kit
                   </a>
-                  <a href="#how" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                    How it works
+                  <a href="/product/3" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                    Complete Hormone Panel
                   </a>
                 </div>
               </div>
@@ -109,14 +109,14 @@ export default function Navigation() {
               <div>
                 <div className="text-white font-medium mb-2">Product</div>
                 <div className="pl-4 space-y-2">
-                  <a href="/product/testosterone" className="block text-text-muted hover:text-white">
+                  <a href="/product/1" className="block text-text-muted hover:text-white">
                     Testosterone Kit
                   </a>
-                  <a href="/product/stress-energy" className="block text-text-muted hover:text-white">
+                  <a href="/product/2" className="block text-text-muted hover:text-white">
                     Stress & Energy Kit
                   </a>
-                  <a href="#how" className="block text-text-muted hover:text-white">
-                    How it works
+                  <a href="/product/3" className="block text-text-muted hover:text-white">
+                    Complete Hormone Panel
                   </a>
                 </div>
               </div>

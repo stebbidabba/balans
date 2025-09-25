@@ -63,16 +63,16 @@ export default function Footer() {
                     </a>
                   </div>
                 ) : (
-                  <h4 className="text-[28px] leading-[1.2] text-text-muted font-medium">
-                    {column.title}
-                  </h4>
+          <h4 className="text-lg leading-[1.2] text-text-muted font-medium">
+            {column.title}
+          </h4>
                 )}
                 <ul className="space-y-3">
                   {column.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
                       <a
                         href={link.href}
-                        className="block text-[36px] md:text-[32px] sm:text-[28px] leading-tight text-text-primary hover:opacity-80 transition-opacity"
+                        className="block text-sm leading-tight text-text-primary hover:opacity-80 transition-opacity"
                       >
                         {link.label}
                       </a>
@@ -87,7 +87,7 @@ export default function Footer() {
           <div className="space-y-7">
             {/* Contact Card */}
             <div className="space-y-4">
-              <h3 className="text-[28px] leading-[1.2] text-text-muted font-medium">
+              <h3 className="text-lg leading-[1.2] text-text-muted font-medium">
                 Have questions?
               </h3>
               <a
@@ -101,10 +101,10 @@ export default function Footer() {
             {/* Email Capture */}
             <div className="space-y-4">
               <div>
-                <h3 className="text-[28px] leading-[1.2] text-text-muted font-medium mb-2">
+                <h3 className="text-lg leading-[1.2] text-text-muted font-medium mb-2">
                   Get updates
                 </h3>
-                <p className="text-text-muted text-base">
+                <p className="text-text-muted text-sm">
                   Drop us your email to learn what's next.
                 </p>
               </div>
@@ -146,7 +146,7 @@ export default function Footer() {
         <div className="border-t border-white/8 pt-6 mt-16">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
-            <p className="text-[15px] text-text-muted">
+            <p className="text-xs text-text-muted">
               © Balans. All rights reserved.
             </p>
 
@@ -154,13 +154,13 @@ export default function Footer() {
             <div className="flex items-center space-x-6">
               <a
                 href="/privacy"
-                className="text-[15px] text-text-muted hover:text-text-primary transition-colors"
+                className="text-xs text-text-muted hover:text-text-primary transition-colors"
               >
                 Privacy policy
               </a>
               <a
                 href="/terms"
-                className="text-[15px] text-text-muted hover:text-text-primary transition-colors"
+                className="text-xs text-text-muted hover:text-text-primary transition-colors"
               >
                 Terms of service
               </a>
