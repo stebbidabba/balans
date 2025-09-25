@@ -63,12 +63,25 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
       <Navigation />
       
+      {/* Unified Background - Full color flow like home page */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Top flowing effects */}
+        <div className="absolute top-[5%] right-[10%] w-[1200px] h-[1200px] bg-gradient-to-bl from-brand/8 via-purple-400/6 to-pink-400/4 rounded-full blur-blob" />
+        <div className="absolute top-[20%] left-[15%] w-[1000px] h-[1000px] bg-gradient-to-tr from-brand-alt/7 via-cyan-400/5 to-emerald-400/3 rounded-full blur-blob" />
+        <div className="absolute top-[40%] center w-[1400px] h-[1400px] bg-gradient-to-b from-purple-500/6 via-violet-400/5 to-blue-400/4 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+        
+        {/* Middle spanning effects */}
+        <div className="absolute center left w-[1600px] h-[1600px] bg-gradient-to-tr from-rose-400/6 via-orange-400/4 to-amber-400/3 rounded-full blur-blob" style={{ left: '20%', top: '60%', transform: 'translateY(-50%)' }} />
+        <div className="absolute center right w-[1400px] h-[1400px] bg-gradient-to-tl from-teal-400/6 via-cyan-400/4 to-sky-400/3 rounded-full blur-blob" style={{ right: '20%', top: '60%', transform: 'translateY(-50%)' }} />
+        
+        {/* Bottom effects stopping before footer */}
+        <div className="absolute bottom-[15%] right-[25%] w-[1200px] h-[1200px] bg-gradient-to-tl from-indigo-400/6 via-purple-400/4 to-brand/3 rounded-full blur-blob" />
+        <div className="absolute bottom-[20%] left-[30%] w-[1000px] h-[1000px] bg-gradient-to-br from-violet-400/5 via-brand/4 to-brand-alt/3 rounded-full blur-blob" />
+        <div className="absolute bottom-[10%] center w-[1400px] h-[1400px] bg-gradient-to-t from-brand/4 via-brand-alt/3 to-purple-500/2 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+      </div>
+      
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[20%] right-[10%] w-[600px] h-[600px] bg-brand/25 rounded-full blur-blob" />
-        <div className="absolute top-[40%] left-[15%] w-[500px] h-[500px] bg-brand-alt/20 rounded-full blur-blob" />
-        <div className="absolute bottom-[10%] center w-[700px] h-[700px] bg-purple-500/15 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+      <section className="relative pt-32 pb-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -81,10 +94,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Cards */}
-      <section className="relative py-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] bg-brand/10 rounded-full blur-blob" />
-        <div className="absolute bottom-[20%] right-[10%] w-[450px] h-[450px] bg-brand-alt/12 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -127,8 +137,7 @@ export default function ContactPage() {
       </section>
 
       {/* Additional Contact Info */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-cyan-400/8 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="max-w-4xl mx-auto">

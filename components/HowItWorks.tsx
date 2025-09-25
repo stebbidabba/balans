@@ -10,13 +10,14 @@ export default function HowItWorks() {
 
   return (
     <section id="how" className="relative py-24 overflow-visible" style={{ background: 'transparent' }}>
-      {/* Continue receiving effects from above */}
-      <div className="absolute top-[-50%] right-[20%] w-[700px] h-[700px] bg-brand/10 rounded-full blur-blob" />
-      <div className="absolute top-[-30%] left-[25%] w-[600px] h-[600px] bg-pink-400/8 rounded-full blur-blob" />
-      
-      {/* Final fade effects */}
-      <div className="absolute bottom-[-20%] left-[15%] w-[500px] h-[500px] bg-brand-alt/6 rounded-full blur-blob" />
-      <div className="absolute bottom-[-10%] right-[35%] w-[400px] h-[400px] bg-brand/5 rounded-full blur-blob" />
+      {/* Continuing the same background structure with color evolution */}
+      <div className="absolute top-[-50%] right-[20%] w-[1400px] h-[1400px] bg-gradient-to-bl from-rose-400/8 to-yellow-400/5 rounded-full blur-blob" />
+      <div className="absolute top-[-30%] left-[25%] w-[1200px] h-[1200px] bg-gradient-to-tr from-orange-400/7 to-lime-400/4 rounded-full blur-blob" />
+      <div className="absolute top-[-40%] center w-[1600px] h-[1600px] bg-gradient-to-b from-amber-400/5 via-yellow-400/3 to-emerald-400/2 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+
+      {/* Massive spanning blobs continuing the flow */}
+      <div className="absolute bottom-[-80%] left-[15%] w-[2400px] h-[2400px] bg-gradient-to-tr from-yellow-400/6 via-lime-400/4 to-cyan-400/2 rounded-full blur-blob" />
+      <div className="absolute bottom-[-60%] right-[35%] w-[2200px] h-[2200px] bg-gradient-to-bl from-lime-400/5 via-emerald-400/3 to-teal-400/2 rounded-full blur-blob" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
         {/* Section Header */}

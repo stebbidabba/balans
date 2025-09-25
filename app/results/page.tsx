@@ -30,11 +30,26 @@ export default function ProcessAndResultsPage() {
     <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
       <Navigation />
       
+      {/* Unified Background - Full color flow like home page */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Rich top effects */}
+        <div className="absolute top-[8%] right-[12%] w-[1400px] h-[1400px] bg-gradient-to-bl from-brand/9 via-purple-400/7 to-pink-400/5 rounded-full blur-blob" />
+        <div className="absolute top-[25%] left-[18%] w-[1200px] h-[1200px] bg-gradient-to-tr from-brand-alt/8 via-cyan-400/6 to-emerald-400/4 rounded-full blur-blob" />
+        <div className="absolute top-[45%] center w-[1600px] h-[1600px] bg-gradient-to-b from-purple-500/7 via-violet-400/6 to-blue-400/5 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+        
+        {/* Middle spanning effects */}
+        <div className="absolute center left w-[1800px] h-[1800px] bg-gradient-to-tr from-rose-400/7 via-orange-400/5 to-amber-400/4 rounded-full blur-blob" style={{ left: '15%', top: '65%', transform: 'translateY(-50%)' }} />
+        <div className="absolute center right w-[1600px] h-[1600px] bg-gradient-to-tl from-teal-400/7 via-cyan-400/5 to-sky-400/4 rounded-full blur-blob" style={{ right: '15%', top: '65%', transform: 'translateY(-50%)' }} />
+        
+        {/* Bottom effects stopping before footer */}
+        <div className="absolute bottom-[20%] right-[20%] w-[1400px] h-[1400px] bg-gradient-to-tl from-indigo-400/7 via-purple-400/5 to-brand/4 rounded-full blur-blob" />
+        <div className="absolute bottom-[25%] left-[25%] w-[1200px] h-[1200px] bg-gradient-to-br from-violet-400/6 via-brand/5 to-brand-alt/4 rounded-full blur-blob" />
+        <div className="absolute bottom-[15%] center w-[1600px] h-[1600px] bg-gradient-to-t from-brand/5 via-brand-alt/4 to-purple-500/3 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+        <div className="absolute bottom-[30%] right-[40%] w-[1000px] h-[1000px] bg-gradient-to-tl from-purple-400/4 via-violet-400/3 to-indigo-400/2 rounded-full blur-blob" />
+      </div>
+      
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[20%] right-[10%] w-[600px] h-[600px] bg-brand/20 rounded-full blur-blob" />
-        <div className="absolute top-[40%] left-[15%] w-[500px] h-[500px] bg-brand-alt/15 rounded-full blur-blob" />
+      <section className="relative pt-32 pb-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
@@ -50,8 +65,7 @@ export default function ProcessAndResultsPage() {
       </section>
 
       {/* Process Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute top-[30%] left-[5%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-16 items-start">
@@ -108,8 +122,7 @@ export default function ProcessAndResultsPage() {
       </section>
 
       {/* Results Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute bottom-[20%] right-[10%] w-[450px] h-[450px] bg-brand-alt/12 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
@@ -127,9 +140,7 @@ export default function ProcessAndResultsPage() {
       </section>
 
       {/* App Guidance Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute top-[20%] right-[15%] w-[500px] h-[500px] bg-brand/8 rounded-full blur-blob" />
-        <div className="absolute bottom-[30%] left-[10%] w-[400px] h-[400px] bg-brand-alt/10 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">

@@ -39,14 +39,14 @@ export default function FeatureCards() {
 
   return (
     <section className="relative py-24 overflow-visible" style={{ background: 'transparent' }}>
-      {/* Seamlessly receive effects from previous section */}
-      <div className="absolute top-[-70%] left-[10%] w-[1000px] h-[1000px] bg-brand/12 rounded-full blur-blob" />
-      <div className="absolute top-[-50%] right-[5%] w-[800px] h-[800px] bg-brand-alt/14 rounded-full blur-blob" />
-      <div className="absolute top-[-60%] center w-[900px] h-[900px] bg-cyan-400/8 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+      {/* Same blob structure, colors naturally evolving */}
+      <div className="absolute top-[-70%] left-[10%] w-[1600px] h-[1600px] bg-gradient-to-br from-purple-400/8 to-rose-400/6 rounded-full blur-blob" />
+      <div className="absolute top-[-50%] right-[5%] w-[1400px] h-[1400px] bg-gradient-to-tl from-pink-400/10 to-orange-400/6 rounded-full blur-blob" />
+      <div className="absolute top-[-60%] center w-[1800px] h-[1800px] bg-gradient-to-b from-brand/6 via-rose-400/4 to-amber-400/3 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
       
-      {/* Continue effects further down */}
-      <div className="absolute bottom-[-40%] left-[40%] w-[800px] h-[800px] bg-pink-400/10 rounded-full blur-blob" />
-      <div className="absolute bottom-[-20%] right-[20%] w-[600px] h-[600px] bg-brand/8 rounded-full blur-blob" />
+      {/* Massive blobs spanning multiple sections */}
+      <div className="absolute bottom-[-80%] left-[40%] w-[2200px] h-[2200px] bg-gradient-to-tr from-rose-400/6 via-orange-400/4 to-yellow-400/3 rounded-full blur-blob" />
+      <div className="absolute bottom-[-60%] right-[20%] w-[2000px] h-[2000px] bg-gradient-to-bl from-orange-400/5 via-amber-400/3 to-lime-400/2 rounded-full blur-blob" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
         {/* Section Header */}

@@ -26,14 +26,14 @@ export default function TimelineCurve() {
 
   return (
     <section className="relative py-24 overflow-visible" style={{ background: 'transparent' }}>
-      {/* Seamlessly continue the colorful blur effects from hero */}
-      <div className="absolute top-[-60%] right-[15%] w-[800px] h-[800px] bg-brand/18 rounded-full blur-blob" />
-      <div className="absolute top-[-40%] left-[20%] w-[700px] h-[700px] bg-brand-alt/15 rounded-full blur-blob" />
-      <div className="absolute top-[-80%] center w-[1000px] h-[1000px] bg-purple-500/10 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
-      
-      {/* Continue effects downward */}
-      <div className="absolute bottom-[-50%] right-[30%] w-[900px] h-[900px] bg-cyan-400/12 rounded-full blur-blob" />
-      <div className="absolute bottom-[-30%] left-[25%] w-[700px] h-[700px] bg-brand/10 rounded-full blur-blob" />
+      {/* Continuous background - same blob positions, gradually shifting colors */}
+      <div className="absolute top-[-60%] right-[15%] w-[1600px] h-[1600px] bg-gradient-to-br from-brand/12 to-purple-400/8 rounded-full blur-blob" />
+      <div className="absolute top-[-40%] left-[20%] w-[1400px] h-[1400px] bg-gradient-to-tr from-brand-alt/10 to-pink-400/6 rounded-full blur-blob" />
+      <div className="absolute top-[-80%] center w-[1800px] h-[1800px] bg-gradient-to-b from-purple-500/8 via-purple-400/6 to-pink-400/4 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+
+      {/* Large spanning blobs that extend through multiple sections */}
+      <div className="absolute bottom-[-80%] right-[30%] w-[2000px] h-[2000px] bg-gradient-to-tl from-pink-400/6 via-rose-400/4 to-orange-400/3 rounded-full blur-blob" />
+      <div className="absolute bottom-[-60%] left-[25%] w-[1800px] h-[1800px] bg-gradient-to-br from-brand/6 via-purple-400/4 to-rose-400/3 rounded-full blur-blob" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
         <div className="relative">

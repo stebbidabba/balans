@@ -126,18 +126,27 @@ export default function AppShowcase() {
   }
 
   return (
-    <section className="py-24 bg-transparent relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-bg-end/50 via-transparent to-bg-start/30" />
-      <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-brand/10 rounded-full blur-blob" />
-      <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] bg-brand-alt/8 rounded-full blur-blob" />
+    <section className="py-24 bg-transparent relative overflow-visible">
+      {/* Optimized seamless background - fewer, strategic blobs */}
+      <div className="absolute top-[-60%] right-[10%] w-[1200px] h-[1200px] bg-gradient-to-bl from-lime-400/8 via-emerald-400/5 to-teal-400/3 rounded-full blur-blob" />
+      <div className="absolute top-[-40%] left-[15%] w-[1000px] h-[1000px] bg-gradient-to-tr from-emerald-400/7 via-cyan-400/4 to-sky-400/3 rounded-full blur-blob" />
+      
+      {/* Strategic spanning blobs */}
+      <div className="absolute center center w-[1400px] h-[1400px] bg-gradient-to-r from-cyan-400/6 via-sky-400/4 to-indigo-400/3 rounded-full blur-blob" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }} />
+      
+      {/* Bottom effects - reduced size */}
+      <div className="absolute bottom-[-40%] right-[20%] w-[1600px] h-[1600px] bg-gradient-to-tl from-sky-400/6 via-blue-400/4 to-indigo-400/3 rounded-full blur-blob" />
+      <div className="absolute bottom-[-20%] left-[25%] w-[1400px] h-[1400px] bg-gradient-to-br from-blue-400/5 via-indigo-400/3 to-violet-400/2 rounded-full blur-blob" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6">
-            The app
+            Track Your Progress
           </h2>
+          <p className="text-lg text-text-muted max-w-2xl mx-auto">
+            Monitor your hormone levels over time and get personalized insights to optimize your health journey.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

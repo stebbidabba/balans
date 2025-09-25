@@ -24,11 +24,11 @@ export default function Hero() {
       <div className="absolute top-[30%] left-[15%] w-[700px] h-[700px] bg-brand-alt/25 rounded-full blur-blob" />
       
       {/* Massive blobs that extend far beyond the section */}
-      <div className="absolute bottom-[-100%] right-[5%] w-[1200px] h-[1200px] bg-brand/20 rounded-full blur-blob" />
-      <div className="absolute bottom-[-80%] left-[10%] w-[1000px] h-[1000px] bg-brand-alt/18 rounded-full blur-blob" />
-      <div className="absolute bottom-[-120%] center w-[1400px] h-[1400px] bg-purple-500/12 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
-      <div className="absolute bottom-[-60%] right-[30%] w-[800px] h-[800px] bg-cyan-400/10 rounded-full blur-blob" />
-      <div className="absolute bottom-[-90%] left-[40%] w-[900px] h-[900px] bg-pink-400/8 rounded-full blur-blob" />
+      <div className="absolute bottom-[-60%] right-[5%] w-[1200px] h-[1200px] bg-brand/20 rounded-full blur-blob" />
+      <div className="absolute bottom-[-40%] left-[10%] w-[1000px] h-[1000px] bg-brand-alt/18 rounded-full blur-blob" />
+      <div className="absolute bottom-[-80%] center w-[1400px] h-[1400px] bg-purple-500/12 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+      <div className="absolute bottom-[-20%] right-[30%] w-[800px] h-[800px] bg-cyan-400/10 rounded-full blur-blob" />
+      <div className="absolute bottom-[-50%] left-[40%] w-[900px] h-[900px] bg-pink-400/8 rounded-full blur-blob" />
       
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 text-center pt-18">

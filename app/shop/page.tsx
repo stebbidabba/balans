@@ -77,10 +77,15 @@ export default function ShopPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[20%] right-[10%] w-[600px] h-[600px] bg-brand/20 rounded-full blur-blob" />
-        <div className="absolute top-[40%] left-[15%] w-[500px] h-[500px] bg-brand-alt/15 rounded-full blur-blob" />
+      <section className="relative pt-32 pb-16 overflow-visible">
+        {/* Background Effects - Vibrant shop colors */}
+        <div className="absolute top-[10%] right-[5%] w-[900px] h-[900px] bg-cyan-400/18 rounded-full blur-blob" />
+        <div className="absolute top-[30%] left-[10%] w-[700px] h-[700px] bg-rose-400/15 rounded-full blur-blob" />
+        <div className="absolute top-[50%] center w-[800px] h-[800px] bg-emerald-400/12 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+        
+        {/* Effects extending down */}
+        <div className="absolute bottom-[-60%] right-[20%] w-[1000px] h-[1000px] bg-purple-500/14 rounded-full blur-blob" />
+        <div className="absolute bottom-[-40%] left-[25%] w-[800px] h-[800px] bg-orange-400/12 rounded-full blur-blob" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -93,10 +98,15 @@ export default function ShopPage() {
       </section>
 
       {/* Products Grid */}
-      <section className="relative py-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-blob" />
-        <div className="absolute bottom-[20%] right-[10%] w-[450px] h-[450px] bg-brand-alt/12 rounded-full blur-blob" />
+      <section className="relative py-16 overflow-visible">
+        {/* Background Effects - Different color mix */}
+        <div className="absolute top-[-40%] left-[5%] w-[800px] h-[800px] bg-indigo-400/15 rounded-full blur-blob" />
+        <div className="absolute top-[-20%] right-[10%] w-[700px] h-[700px] bg-yellow-400/12 rounded-full blur-blob" />
+        <div className="absolute top-[-30%] center w-[900px] h-[900px] bg-pink-400/10 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+        
+        {/* Bottom effects */}
+        <div className="absolute bottom-[-50%] right-[15%] w-[1000px] h-[1000px] bg-teal-400/12 rounded-full blur-blob" />
+        <div className="absolute bottom-[-30%] left-[20%] w-[800px] h-[800px] bg-lime-400/10 rounded-full blur-blob" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

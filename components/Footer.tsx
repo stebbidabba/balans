@@ -43,7 +43,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="w-full bg-bg-card text-text-primary py-20 border-t border-divider">
+    <footer className="relative w-full bg-bg-card text-text-primary py-20 border-t border-divider z-50">
       <div className="mx-auto max-w-7xl px-6 md:px-8">
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-16">
