@@ -93,12 +93,12 @@ export default function ProcessAndResultsPage() {
             </div>
 
             {/* Right Side - Process Steps */}
-            <div className="space-y-8">
+            <div className="space-y-12">
               {processSteps.map((step, index) => (
                 <div key={index} className="flex items-start space-x-6">
                   {/* Step Number */}
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-brand flex items-center justify-center">
                       <span className="text-xl font-bold text-black">
                         {step.number}
                       </span>
@@ -107,7 +107,7 @@ export default function ProcessAndResultsPage() {
                   
                   {/* Step Content */}
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-brand mb-3">
+                    <h3 className="text-xl font-semibold text-brand mb-4">
                       {step.title}
                     </h3>
                     <p className="text-text-muted leading-relaxed">

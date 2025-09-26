@@ -1,0 +1,129 @@
+{
+    "meta": {
+      "name": "Balans Footer",
+      "component": "Footer",
+      "framework": "nextjs",
+      "css": "tailwind",
+      "fonts": { "primary": "Work Sans" }
+    },
+  
+    "tokens": {
+      "colors": {
+        "bg": "#F6F5EE",
+        "fg": "#0E0F12",
+        "muted": "rgba(14,15,18,0.55)",
+        "button": "#0D8BFF",
+        "buttonText": "#FFFFFF",
+        "inputBg": "#FFFFFF",
+        "inputBorder": "rgba(14,15,18,0.12)"
+      },
+      "radius": { "lg": "16px", "xl": "24px" },
+      "shadow": { "soft": "0 8px 24px rgba(0,0,0,0.08)" },
+      "spacing": { "x": "24px", "y": "80px", "gridGap": "64px" }
+    },
+  
+    "layout": {
+      "container": { "maxWidth": "1280px", "paddingX": "24px" },
+      "grid": {
+        "columns": {
+          "desktop": "3fr 2fr",
+          "tablet": "1fr",
+          "gap": "tokens.spacing.gridGap"
+        }
+      }
+    },
+  
+    "leftColumns": {
+      "type": "link-columns",
+      "columns": [
+        {
+          "title": "Balans",
+          "titleStyle": "text-[28px] leading-[1.2] text-[tokens.colors.muted] font-medium",
+          "links": [
+            { "label": "News", "href": "/news" },
+            { "label": "Insights", "href": "/insights" },
+            { "label": "Jobs", "href": "/careers" },
+            { "label": "Showrooms", "href": "/showrooms" },
+            { "label": "For Developers", "href": "/developers" }
+          ],
+          "linkStyle": "block text-[36px] md:text-[32px] sm:text-[28px] leading-tight text-[tokens.colors.fg] hover:opacity-80"
+        },
+        {
+          "title": "Backyard",
+          "titleStyle": "text-[28px] leading-[1.2] text-[tokens.colors.muted] font-medium",
+          "links": [
+            { "label": "Models", "href": "/models" },
+            { "label": "Design yours", "href": "/design" },
+            { "label": "How it works", "href": "/how-it-works" },
+            { "label": "Financing", "href": "/financing" },
+            { "label": "FAQ", "href": "/faq" },
+            { "label": "Local guides", "href": "/guides" }
+          ],
+          "linkStyle": "block text-[36px] md:text-[32px] sm:text-[28px] leading-tight text-[tokens.colors.fg] hover:opacity-80"
+        },
+        {
+          "title": "Social",
+          "titleStyle": "text-[28px] leading-[1.2] text-[tokens.colors.muted] font-medium",
+          "links": [
+            { "label": "Instagram", "href": "https://instagram.com" },
+            { "label": "YouTube", "href": "https://youtube.com" },
+            { "label": "LinkedIn", "href": "https://linkedin.com" }
+          ],
+          "linkStyle": "block text-[36px] md:text-[32px] sm:text-[28px] leading-tight text-[tokens.colors.fg] hover:opacity-80"
+        }
+      ],
+      "gapY": 20
+    },
+  
+    "rightPanel": {
+      "type": "cta-stack",
+      "stackGap": 28,
+      "items": [
+        {
+          "kind": "card-button",
+          "title": "Have questions?",
+          "button": {
+            "label": "Contact us",
+            "href": "/contact",
+            "style": "w-full h-14 rounded-[tokens.radius.xl] bg-[tokens.colors.button] text-[tokens.colors.buttonText] font-semibold shadow-soft hover:opacity-90"
+          }
+        },
+        {
+          "kind": "email-capture",
+          "title": "Get updates",
+          "subtitle": "Drop us your email to learn what’s next.",
+          "form": {
+            "action": "/api/subscribe",
+            "method": "POST",
+            "input": {
+              "name": "email",
+              "type": "email",
+              "placeholder": "your@email.com",
+              "style": "w-full h-14 rounded-[tokens.radius.xl] bg-[tokens.colors.inputBg] border border-[tokens.colors.inputBorder] px-5 text-[tokens.colors.fg] placeholder-[tokens.colors.muted]"
+            },
+            "submitIcon": true
+          }
+        }
+      ]
+    },
+  
+    "bottomBar": {
+      "note": "© Balans. All rights reserved.",
+      "rightLinks": [
+        { "label": "Privacy policy", "href": "/privacy" },
+        { "label": "Terms of service", "href": "/terms" }
+      ],
+      "style": {
+        "paddingY": "24px",
+        "borderTop": "1px solid rgba(14,15,18,0.08)",
+        "text": "text-[15px] text-[tokens.colors.muted]"
+      }
+    },
+  
+    "styles": {
+      "root": "w-full bg-[tokens.colors.bg] text-[tokens.colors.fg] py-[tokens.spacing.y]",
+      "container": "mx-auto max-w-[layout.container.maxWidth] px-[layout.container.paddingX]",
+      "grid": "grid grid-cols-1 lg:grid-cols-[layout.grid.columns.desktop] gap-[layout.grid.columns.gap]"
+    }
+  }
+  

@@ -27,7 +27,7 @@ export default function HowItWorks() {
           </h2>
         </div>
 
-        {/* Steps Grid */}
+        {/* Steps Grid - Regular Spacing */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((stepItem, index) => (
             <div key={index} className="text-center group">

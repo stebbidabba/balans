@@ -79,9 +79,9 @@ export default function Navigation() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-text-muted hover:text-white transition-colors">
+            <a href="/login" className="text-text-muted hover:text-white transition-colors">
               Log in
-            </button>
+            </a>
             <button className="px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all">
               Cart
             </button>
@@ -141,9 +141,9 @@ export default function Navigation() {
                 Contact
               </a>
               <div className="pt-4 space-y-2">
-                <button className="block w-full text-left text-text-muted hover:text-white">
+                <a href="/login" className="block w-full text-left text-text-muted hover:text-white">
                   Log in
-                </button>
+                </a>
                 <button className="w-full px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button">
                   Cart
                 </button>

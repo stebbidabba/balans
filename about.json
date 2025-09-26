@@ -1,0 +1,120 @@
+{
+    "meta": {
+      "name": "About / Our Mission",
+      "component": "AboutSection",
+      "framework": "nextjs",
+      "css": "tailwind",
+      "fonts": { "primary": "Work Sans" }
+    },
+  
+    "tokens": {
+      "colors": {
+        "bg.primary": "var(--bg-start, #0B2240)",        
+        "bg.secondary": "var(--bg-end, #0E2C57)",         
+        "text.primary": "rgba(255,255,255,0.95)",
+        "text.muted": "rgba(255,255,255,0.82)",
+        "fan.pink": "#FF9BD5",
+        "fan.yellow": "#FFE37A",
+        "fan.blue1": "#1F7BFF",
+        "fan.blue2": "#5FB0FF",
+        "fan.stroke": "rgba(255,255,255,0.35)"
+      },
+      "spacing": {
+        "sectionY": "128px",
+        "contentMax": "900px"
+      }
+    },
+  
+    "section": {
+      "id": "about",
+      "style": {
+        "background": "radial-gradient(120% 120% at 60% -10%, var(--bg-end, #0E2C57) 0%, var(--bg-start, #0B2240) 60%, #081A33 100%)",
+        "paddingY": "tokens.spacing.sectionY",
+        "textAlign": "center"
+      },
+      "content": {
+        "heading": "Our Mission",
+        "headingClass": "text-[44px] md:text-[56px] leading-tight font-semibold text-[tokens.colors.text.primary]",
+        "paragraphs": [
+          "Individuals have not hit the limits of their potential. Groups of individuals are even farther from their potential.",
+          "Step by step, we do the hard work to deliver working products that empower everyone to continuously dream bigger, even in the most complex scenarios.",
+          "We let every individual dream bigger. We let every organization dream bigger. We dream bigger."
+        ],
+        "paragraphClass": "text-[18px] md:text-[20px] leading-relaxed text-[tokens.colors.text.muted] max-w-[tokens.spacing.contentMax] mx-auto mt-6 space-y-6"
+      }
+    },
+  
+    "decoration": {
+      "type": "svg-fan",
+      "position": "bottom-right",
+      "zIndex": 0,
+      "svg": {
+        "viewBox": "0 0 1200 700",
+        "preserveAspectRatio": "xMaxYMax slice",
+        "paths": [
+          {
+            "kind": "fan-fill",
+            "d": "M1200,700 L700,700 C700,500 850,380 980,300 C1080,240 1150,180 1200,100 Z",
+            "fill": "url(#fanGradient)"
+          },
+          {
+            "kind": "fan-fill",
+            "d": "M1200,700 L860,700 C860,530 980,430 1100,350 C1150,320 1180,260 1200,220 Z",
+            "fill": "url(#fanGradientSoft)"
+          },
+          {
+            "kind": "fan-stroke",
+            "d": "M720,700 C760,520 940,380 1200,260",
+            "stroke": "tokens.colors.fan.stroke",
+            "strokeWidth": 2,
+            "strokeDasharray": "10 10",
+            "fill": "none"
+          },
+          {
+            "kind": "fan-stroke",
+            "d": "M820,700 C860,540 1020,420 1200,320",
+            "stroke": "tokens.colors.fan.stroke",
+            "strokeWidth": 2,
+            "strokeDasharray": "10 10",
+            "fill": "none"
+          },
+          {
+            "kind": "fan-stroke",
+            "d": "M920,700 C950,560 1080,470 1200,380",
+            "stroke": "tokens.colors.fan.stroke",
+            "strokeWidth": 2,
+            "strokeDasharray": "10 10",
+            "fill": "none"
+          }
+        ],
+        "defs": [
+          {
+            "id": "fanGradient",
+            "type": "linearGradient",
+            "attrs": { "x1": "0%", "y1": "100%", "x2": "100%", "y2": "0%" },
+            "stops": [
+              { "offset": "0%", "color": "tokens.colors.fan.yellow", "opacity": 0.9 },
+              { "offset": "45%", "color": "tokens.colors.fan.pink", "opacity": 0.85 },
+              { "offset": "100%", "color": "tokens.colors.fan.blue1", "opacity": 0.95 }
+            ]
+          },
+          {
+            "id": "fanGradientSoft",
+            "type": "linearGradient",
+            "attrs": { "x1": "0%", "y1": "100%", "x2": "100%", "y2": "0%" },
+            "stops": [
+              { "offset": "0%", "color": "tokens.colors.fan.yellow", "opacity": 0.55 },
+              { "offset": "40%", "color": "tokens.colors.fan.pink", "opacity": 0.5 },
+              { "offset": "100%", "color": "tokens.colors.fan.blue2", "opacity": 0.6 }
+            ]
+          }
+        ]
+      }
+    },
+  
+    "a11y": {
+      "landmark": "region",
+      "ariaLabel": "About — Our Mission"
+    }
+  }
+  
