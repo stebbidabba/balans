@@ -1,8 +1,26 @@
+'use client'
+
 import Navigation from '@/components/Navigation'
 import HormoneCards from '@/components/HormoneCards'
 import Footer from '@/components/Footer'
+import { useCart } from '@/contexts/CartContext'
 
 export default function ProcessAndResultsPage() {
+  const { dispatch } = useCart()
+  
+  const handleAddToCart = () => {
+    dispatch({
+      type: 'ADD_ITEM',
+      payload: {
+        id: '1',
+        name: 'Testosterone Kit',
+        price: 89,
+        image: '/testkit.png',
+        variant: 'Track free testosterone with a simple saliva test.'
+      }
+    })
+    // Cart will not open automatically - user must click cart button
+  }
   const processSteps = [
     {
       number: "1",
@@ -80,7 +98,10 @@ export default function ProcessAndResultsPage() {
                 Get lab-quality results from the comfort of your home.
               </p>
               
-                  <button className="px-8 py-4 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all">
+                  <button 
+                    onClick={handleAddToCart}
+                    className="px-8 py-4 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all"
+                  >
                     Add to Cart
                   </button>
               

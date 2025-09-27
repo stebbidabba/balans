@@ -1,7 +1,10 @@
+'use client'
+
 import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { notFound } from 'next/navigation'
+import { useCart } from '@/contexts/CartContext'
 
 interface Product {
   id: number
@@ -181,26 +184,27 @@ const products: Record<string, Product> = {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = products[params.id]
-  
-  if (!product) {
-    return {
-      title: 'Product Not Found - Balans'
-    }
-  }
-
-  return {
-    title: `${product.name} - Balans`,
-    description: product.description,
-  }
-}
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const product = products[params.id]
+  const { dispatch } = useCart()
   
   if (!product) {
     notFound()
+  }
+
+  const handleAddToCart = () => {
+    dispatch({
+      type: 'ADD_ITEM',
+      payload: {
+        id: params.id,
+        name: product.name,
+        price: parseFloat(product.price.replace('$', '')),
+        image: product.image,
+        variant: product.description
+      }
+    })
+    // Cart will not open automatically - user must click cart button
   }
 
   return (
@@ -234,7 +238,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all">
+                <button 
+                  onClick={handleAddToCart}
+                  className="px-8 py-4 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all"
+                >
                   Add to Cart
                 </button>
                 <button className="px-8 py-4 rounded-xl bg-black text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center">

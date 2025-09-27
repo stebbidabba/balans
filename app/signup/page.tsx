@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sign In | Balans',
-  description: 'Sign in to your Balans account to access your hormone testing results and personalized health insights.',
+  title: 'Sign Up | Balans',
+  description: 'Create your Balans account to access hormone testing results and personalized health insights.',
 }
 
-export default function LoginPage() {
+export default function SignUpPage() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background blur effects */}
@@ -33,15 +33,31 @@ export default function LoginPage() {
 
           {/* Main Card */}
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
-            {/* Welcome Back Title */}
+            {/* Create Account Title */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-                Welcome back
+                Create account
               </h1>
             </div>
 
-            {/* Login Form */}
+            {/* Sign Up Form */}
             <form className="space-y-6">
+              {/* Full Name Field */}
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  placeholder="Enter your full name"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+                />
+              </div>
+
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -68,9 +84,9 @@ export default function LoginPage() {
                     id="password"
                     name="password"
                     type="password"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     required
-                    placeholder="Enter your password"
+                    placeholder="Create a password"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all pr-12"
                   />
                   <button
@@ -85,32 +101,34 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Forgot Password Link */}
-              <div className="text-left">
-                <a 
-                  href="/forgot-password" 
-                  className="text-sm text-brand hover:text-brand/80 transition-colors"
-                >
-                  Forgot password?
+              {/* Terms and Privacy */}
+              <div className="text-sm text-gray-600">
+                By creating an account, you agree to our{' '}
+                <a href="/terms" className="text-brand hover:text-brand/80 transition-colors">
+                  Terms of Use
+                </a>
+                {' '}and{' '}
+                <a href="/privacy" className="text-brand hover:text-brand/80 transition-colors">
+                  Privacy Policy
                 </a>
               </div>
 
-              {/* Log In Button */}
+              {/* Sign Up Button */}
               <button
                 type="submit"
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Log in
+                Sign up
               </button>
             </form>
 
-            {/* Sign Up Button */}
+            {/* Log In Button */}
             <div className="mt-4">
               <a
-                href="/signup"
+                href="/login"
                 className="w-full block text-center bg-white hover:bg-gray-50 text-gray-900 font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200"
               >
-                Sign up
+                Log in
               </a>
             </div>
 

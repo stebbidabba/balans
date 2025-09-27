@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useCart } from '../contexts/CartContext'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { state, dispatch } = useCart()
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-transparent backdrop-blur-sm border-b border-white/10">
@@ -82,8 +84,16 @@ export default function Navigation() {
             <a href="/login" className="text-text-muted hover:text-white transition-colors">
               Log in
             </a>
-            <button className="px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all">
+            <button 
+              onClick={() => dispatch({ type: 'TOGGLE_CART' })}
+              className="px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all relative"
+            >
               Cart
+              {state.items.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {state.items.length}
+                </span>
+              )}
             </button>
           </div>
 
@@ -144,8 +154,16 @@ export default function Navigation() {
                 <a href="/login" className="block w-full text-left text-text-muted hover:text-white">
                   Log in
                 </a>
-                <button className="w-full px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button">
+                <button 
+                  onClick={() => dispatch({ type: 'TOGGLE_CART' })}
+                  className="w-full px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button relative"
+                >
                   Cart
+                  {state.items.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {state.items.length}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>

@@ -1,13 +1,27 @@
+'use client'
+
 import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
-
-export const metadata: Metadata = {
-  title: 'Shop - Balans',
-  description: 'Shop our hormone testing kits and wellness products for better health insights.',
-}
+import { useCart } from '@/contexts/CartContext'
 
 export default function ShopPage() {
+  const { dispatch } = useCart()
+  
+  const handleAddToCart = (product: any) => {
+    dispatch({
+      type: 'ADD_ITEM',
+      payload: {
+        id: product.id.toString(),
+        name: product.name,
+        price: parseFloat(product.price.replace('$', '')),
+        image: product.image,
+        variant: product.description
+      }
+    })
+    // Cart will not open automatically - user must click cart button
+  }
+  
   const products = [
     {
       id: 1,
@@ -187,12 +201,20 @@ export default function ShopPage() {
                     </div>
                     
                     {product.available ? (
-                      <a 
-                        href={`/product/${product.id}`}
-                        className="block w-full px-6 py-3 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all group-hover:scale-105 text-center"
-                      >
-                        View Details
-                      </a>
+                      <div className="space-y-2">
+                        <button 
+                          onClick={() => handleAddToCart(product)}
+                          className="w-full px-6 py-3 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all group-hover:scale-105"
+                        >
+                          Add to Cart — {product.price}
+                        </button>
+                        <a 
+                          href={`/product/${product.id}`}
+                          className="block w-full px-6 py-2 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all text-center"
+                        >
+                          View Details
+                        </a>
+                      </div>
                     ) : (
                       <button 
                         disabled
