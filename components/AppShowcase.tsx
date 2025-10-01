@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface ChartData {
   month: string
@@ -21,6 +22,7 @@ interface HormoneChart {
 
 export default function AppShowcase() {
   const [selectedHormone, setSelectedHormone] = useState(0)
+  const { t } = useI18n()
 
   const hormoneData: HormoneChart[] = [
     {
@@ -142,10 +144,10 @@ export default function AppShowcase() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6">
-            Track Your Progress
+            {t('track_your_progress')}
           </h2>
           <p className="text-lg text-text-muted max-w-2xl mx-auto">
-            Monitor your hormone levels over time and get personalized insights to optimize your health journey.
+            {t('track_progress_description')}
           </p>
         </div>
 
@@ -272,10 +274,10 @@ export default function AppShowcase() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Track Progress
+                    {t('track_progress')}
                   </h3>
                   <p className="text-text-muted leading-relaxed">
-                    See how your hormone levels change over time and identify patterns that help you understand your body better.
+                    {t('track_progress_desc')}
                   </p>
                 </div>
               </div>
@@ -288,10 +290,10 @@ export default function AppShowcase() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Personalized Recommendations
+                    {t('personalized_recommendations')}
                   </h3>
                   <p className="text-text-muted leading-relaxed">
-                    Get tailored recommendations based on your results for nutrition, exercise, and lifestyle changes.
+                    {t('personalized_recommendations_desc')}
                   </p>
                 </div>
               </div>
@@ -304,10 +306,10 @@ export default function AppShowcase() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Reminders & Plans
+                    {t('reminders_plans')}
                   </h3>
                   <p className="text-text-muted leading-relaxed">
-                    Set up reminders for your next tests and follow personalized plans to improve your hormone balance.
+                    {t('reminders_plans_desc')}
                   </p>
                 </div>
               </div>

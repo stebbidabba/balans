@@ -1,39 +1,43 @@
 'use client'
 
+import { useI18n } from '@/contexts/I18nContext'
+
 export default function FeatureCards() {
+  const { t } = useI18n()
+  
   const cards = [
     {
-      title: "Testosterone Kit",
-      desc: "Track free testosterone with a simple saliva test.",
+      title: t('testosterone_kit'),
+      desc: t('testosterone_kit_description'),
       image: "/testkit.png",
       bullets: [
-        "Saliva tube + prepaid return",
-        "Results in 3–5 days",
-        "Private online dashboard"
+        t('feature_saliva_tube'),
+        t('feature_results_3_5_days'),
+        t('feature_private_dashboard')
       ],
-      cta: { label: "Order now — $89", href: "/product/1" }
+      cta: { label: `${t('order_now')} — 12.900 ISK`, href: "/product/1" }
     },
     {
-      title: "Stress & Energy Kit",
-      desc: "Assess cortisol and related markers to understand stress load.",
+      title: t('stress_energy_kit'),
+      desc: t('stress_energy_kit_description'),
       image: "/stresskit.png",
       bullets: [
-        "Morning & evening collection",
-        "Lab-grade analysis",
-        "Actionable insights"
+        t('feature_morning_evening'),
+        t('feature_lab_grade_analysis'),
+        t('feature_actionable_insights')
       ],
-      cta: { label: "Order now — $99", href: "/product/2" }
+      cta: { label: `${t('order_now')} — 14.400 ISK`, href: "/product/2" }
     },
     {
-      title: "Complete Hormone Panel",
-      desc: "Comprehensive testing for testosterone, cortisol, and DHEA.",
+      title: t('complete_hormone_panel'),
+      desc: t('complete_hormone_panel_description'),
       image: "/testkit.png",
       bullets: [
-        "Tests all major hormones",
-        "Comprehensive analysis",
-        "Expert consultation included"
+        t('feature_full_hormone_spectrum'),
+        t('feature_advanced_biomarkers'),
+        t('feature_expert_guidance')
       ],
-      cta: { label: "Order now — $149", href: "/product/3" }
+      cta: { label: `${t('order_now')} — 19.900 ISK`, href: "/product/3" }
     }
   ]
 

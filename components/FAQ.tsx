@@ -1,26 +1,28 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const { t } = useI18n()
 
   const faqItems = [
     { 
-      q: "How accurate are the tests?", 
-      a: "We use certified partner labs and validated ELISA methodology with quality controls on each run." 
+      q: t('faq_accuracy_q'), 
+      a: t('faq_accuracy_a')
     },
     { 
-      q: "How long do results take?", 
-      a: "Typically 3–5 business days after the lab receives your sample." 
+      q: t('faq_results_time_q'), 
+      a: t('faq_results_time_a')
     },
     { 
-      q: "Is my data private?", 
-      a: "Yes. All results are encrypted and only accessible in your dashboard." 
+      q: t('faq_privacy_q'), 
+      a: t('faq_privacy_a')
     },
     { 
-      q: "Do you ship to Iceland?", 
-      a: "Yes, national shipping is supported. International options coming soon." 
+      q: t('faq_shipping_q'), 
+      a: t('faq_shipping_a')
     }
   ]
 
@@ -45,7 +47,7 @@ export default function FAQ() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-            Frequently asked questions
+            {t('faq_title')}
           </h2>
         </div>
 

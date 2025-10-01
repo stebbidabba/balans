@@ -1,11 +1,15 @@
 'use client'
 
+import { useI18n } from '@/contexts/I18nContext'
+
 export default function HowItWorks() {
+  const { t } = useI18n()
+  
   const steps = [
-    { step: "1", title: "Order", desc: "We ship your kit within 24h." },
-    { step: "2", title: "Collect", desc: "Follow the 3-minute instructions." },
-    { step: "3", title: "Return", desc: "Drop at post box with prepaid label." },
-    { step: "4", title: "Results", desc: "See your results and next steps online." }
+    { step: "1", title: t('step_order'), desc: t('step_order_desc') },
+    { step: "2", title: t('step_collect'), desc: t('step_collect_desc') },
+    { step: "3", title: t('step_return'), desc: t('step_return_desc') },
+    { step: "4", title: t('step_results'), desc: t('step_results_desc') }
   ]
 
   return (
@@ -23,7 +27,7 @@ export default function HowItWorks() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-            How it works
+            {t('how_it_works')}
           </h2>
         </div>
 

@@ -4,9 +4,18 @@ import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { useCart } from '@/contexts/CartContext'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase-client'
+import Link from 'next/link'
+import PersonalizedProducts from '@/components/PersonalizedProducts'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function ShopPage() {
   const { dispatch } = useCart()
+  const { t } = useI18n()
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
   const handleAddToCart = (product: any) => {
     dispatch({
@@ -14,274 +23,284 @@ export default function ShopPage() {
       payload: {
         id: product.id.toString(),
         name: product.name,
-        price: parseFloat(product.price.replace('$', '')),
-        image: product.image,
+        price: product.price_isk ? product.price_isk / 100 : parseFloat(product.price?.replace('$', '') || '0'),
+        image: product.image_url || product.image || '/testkit.png',
         variant: product.description
       }
     })
     // Cart will not open automatically - user must click cart button
   }
-  
-  const products = [
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        console.log('Fetching products...')
+        const supabase = createClient()
+        const { data, error } = await supabase.from("products")
+          .select("id, name, description, price_isk, sku, image_url")
+          .eq("active", true)
+          .order("created_at", { ascending: true })
+
+        console.log('Supabase response:', { data, error })
+
+        if (error) {
+          console.error('Failed to load products:', error)
+          setError(error.message)
+          // Use fallback products
+          console.log('Using fallback products due to error')
+          setProducts(fallbackProducts)
+        } else if (data && data.length > 0) {
+          console.log('Using Supabase products:', data)
+          setProducts(data)
+        } else {
+          // Use fallback products if no data
+          console.log('No Supabase data, using fallback products')
+          setProducts(fallbackProducts)
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err)
+        setError('Failed to fetch products')
+        console.log('Using fallback products due to exception')
+        setProducts(fallbackProducts)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  // Fallback products with translation keys
+  const fallbackProducts = [
     {
       id: 1,
-      name: 'Testosterone Kit',
-      description: 'Track free testosterone with a simple saliva test.',
+      name: t('testosterone_kit'),
+      description: t('testosterone_kit_description'),
       price: '$89',
+      price_isk: 12900,
       image: '/testkit.png',
       features: [
-        'Saliva tube + prepaid return',
-        'Results in 3–5 days',
-        'Private online dashboard',
-        'Personalized recommendations'
+        t('feature_saliva_tube'),
+        t('feature_results_3_5_days'),
+        t('feature_private_dashboard'),
+        t('feature_personalized_recommendations')
       ],
       popular: false,
       available: true
     },
     {
       id: 2,
-      name: 'Stress & Energy Kit',
-      description: 'Assess cortisol and related markers to understand stress load.',
+      name: t('stress_energy_kit'),
+      description: t('stress_energy_kit_description'),
       price: '$99',
+      price_isk: 14400,
       image: '/stresskit.png',
       features: [
-        'Morning & evening collection',
-        'Lab-grade analysis',
-        'Actionable insights',
-        'Lifestyle recommendations'
+        t('feature_morning_evening'),
+        t('feature_lab_grade_analysis'),
+        t('feature_actionable_insights'),
+        t('feature_stress_management_tips')
       ],
       popular: true,
       available: true
     },
     {
       id: 3,
-      name: 'Complete Hormone Panel',
-      description: 'Comprehensive testing for testosterone, cortisol, and DHEA.',
-      price: '$149',
+      name: t('complete_hormone_panel'),
+      description: t('complete_hormone_panel_description'),
+      price: '$139',
+      price_isk: 19900,
       image: '/testkit.png',
       features: [
-        'All hormone markers',
-        'Comprehensive analysis',
-        'Detailed health report',
-        'Expert consultation included'
+        t('feature_full_hormone_spectrum'),
+        t('feature_advanced_biomarkers'),
+        t('feature_detailed_health_report'),
+        t('feature_expert_guidance')
       ],
       popular: false,
       available: true
     },
     {
       id: 4,
-      name: "Women's Panel",
-      description: 'Comprehensive hormone testing designed specifically for women.',
-      price: 'TBA',
+      name: t('womens_panel'),
+      description: t('womens_panel_description'),
+      price: '$119',
+      price_isk: 17000,
       image: '/testkit.png',
       features: [
-        'Estrogen & progesterone',
-        'Thyroid function markers',
-        'Cortisol & DHEA analysis',
-        'Cycle-specific insights'
+        t('feature_female_specific'),
+        t('feature_cycle_tracking'),
+        t('feature_fertility_markers'),
+        t('feature_menopause_indicators')
       ],
       popular: false,
-      available: false,
-      comingSoon: true
+      available: false // Coming soon
     }
   ]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
+        <Navigation />
+        
+        {/* Background blur effects */}
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute -top-[10%] -left-[5%] w-[600px] h-[600px] bg-gradient-to-br from-brand/25 via-purple-500/15 to-blue-500/20 rounded-full blur-blob"></div>
+          <div className="absolute top-[20%] -right-[10%] w-[700px] h-[700px] bg-gradient-to-bl from-emerald-400/20 via-cyan-400/15 to-brand/25 rounded-full blur-blob"></div>
+          <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] bg-gradient-to-tr from-purple-400/15 via-pink-400/10 to-brand/20 rounded-full blur-blob"></div>
+        </div>
+
+        <section className="relative pt-32 pb-20">
+          <div className="max-w-7xl mx-auto px-6 md:px-8 text-center">
+            <div className="animate-pulse">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{t('loading_products')}</h1>
+            </div>
+          </div>
+        </section>
+        
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
       <Navigation />
       
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-16 overflow-visible">
-        {/* Background Effects - Vibrant shop colors */}
-        <div className="absolute top-[10%] right-[5%] w-[900px] h-[900px] bg-cyan-400/18 rounded-full blur-blob" />
-        <div className="absolute top-[30%] left-[10%] w-[700px] h-[700px] bg-rose-400/15 rounded-full blur-blob" />
-        <div className="absolute top-[50%] center w-[800px] h-[800px] bg-emerald-400/12 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
-        
-        {/* Effects extending down */}
-        <div className="absolute bottom-[-60%] right-[20%] w-[1000px] h-[1000px] bg-purple-500/14 rounded-full blur-blob" />
-        <div className="absolute bottom-[-40%] left-[25%] w-[800px] h-[800px] bg-orange-400/12 rounded-full blur-blob" />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Shop Hormone Testing Kits
-          </h1>
-          <p className="text-lg text-text-muted max-w-2xl mx-auto">
-            Choose from our scientifically-backed testing kits to gain insights into your hormone health and optimize your wellbeing.
-          </p>
-        </div>
-      </section>
+      {/* Background blur effects */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute -top-[10%] -left-[5%] w-[600px] h-[600px] bg-gradient-to-br from-brand/25 via-purple-500/15 to-blue-500/20 rounded-full blur-blob"></div>
+        <div className="absolute top-[20%] -right-[10%] w-[700px] h-[700px] bg-gradient-to-bl from-emerald-400/20 via-cyan-400/15 to-brand/25 rounded-full blur-blob"></div>
+        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] bg-gradient-to-tr from-purple-400/15 via-pink-400/10 to-brand/20 rounded-full blur-blob"></div>
+      </div>
 
-      {/* Products Grid */}
-      <section className="relative py-16 overflow-visible">
-        {/* Background Effects - Different color mix */}
-        <div className="absolute top-[-40%] left-[5%] w-[800px] h-[800px] bg-indigo-400/15 rounded-full blur-blob" />
-        <div className="absolute top-[-20%] right-[10%] w-[700px] h-[700px] bg-yellow-400/12 rounded-full blur-blob" />
-        <div className="absolute top-[-30%] center w-[900px] h-[900px] bg-pink-400/10 rounded-full blur-blob" style={{ left: '50%', transform: 'translateX(-50%)' }} />
-        
-        {/* Bottom effects */}
-        <div className="absolute bottom-[-50%] right-[15%] w-[1000px] h-[1000px] bg-teal-400/12 rounded-full blur-blob" />
-        <div className="absolute bottom-[-30%] left-[20%] w-[800px] h-[800px] bg-lime-400/10 rounded-full blur-blob" />
-        
+      <section className="relative pt-32 pb-20 overflow-visible">
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              {t('shop_hormone_testing_kits')}
+            </h1>
+            <p className="text-lg text-text-muted max-w-2xl mx-auto">
+              {t('shop_description')}
+            </p>
+          </div>
+
+          {/* Personalized Recommendations - Temporarily disabled for debugging */}
+          {/* <div className="mb-16">
+            <PersonalizedProducts />
+          </div> */}
+
+          {/* All Products Section */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">{t('all_products')}</h2>
+            <p className="text-text-muted">{t('browse_complete_collection')}</p>
+          </div>
+
+          {/* Products Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className={`relative glass-card rounded-xl p-8 hover:shadow-xl transition-all duration-300 group ${
-                  !product.available ? 'opacity-90' : ''
-                }`}
-              >
-                {/* Popular Badge */}
-                {product.popular && product.available && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-brand text-black text-sm font-semibold px-4 py-1 rounded-full">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                {/* Coming Soon Badge */}
-                {product.comingSoon && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
-                      Coming Soon
-                    </span>
-                  </div>
-                )}
-
-                {/* Product Image */}
-                <div className={`w-full h-48 bg-gradient-to-br from-brand/20 to-brand-alt/20 rounded-lg mb-6 flex items-center justify-center overflow-hidden relative ${
-                  !product.available ? 'grayscale' : ''
-                }`}>
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className={`w-full h-full object-contain p-4 ${
-                      !product.available ? 'opacity-60' : ''
-                    }`}
-                  />
-                  {!product.available && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-purple-500/90 text-white px-4 py-2 rounded-lg font-semibold">
-                        Coming Soon
-                      </div>
+            {products.map((product: any) => (
+              <div key={product.id} className="group relative">
+                <div className="bg-bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-soft border border-white/10 hover:border-white/20 transition-all duration-300 group-hover:shadow-glow h-full flex flex-col">
+                  {/* Product Badge */}
+                  {product.popular && (
+                    <div className="absolute -top-3 -right-3 bg-brand text-black px-4 py-1 rounded-full text-sm font-semibold shadow-button">
+                      {t('popular')}
                     </div>
                   )}
-                </div>
 
-                {/* Product Info */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-text-muted leading-relaxed">
-                      {product.description}
-                    </p>
+                  {product.available === false && (
+                    <div className="absolute -top-3 -right-3 bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      {t('coming_soon')}
+                    </div>
+                  )}
+
+                  {/* Product Image */}
+                  <div className="mb-6 flex justify-center">
+                    <img 
+                      src={product.image_url || product.image || '/testkit.png'} 
+                      alt={product.name}
+                      className={`h-32 w-auto object-contain ${product.available === false ? 'grayscale opacity-60' : ''}`}
+                    />
                   </div>
 
-                  {/* Features */}
-                  <ul className="space-y-2">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-text-muted">
-                        <svg className="w-4 h-4 text-brand-alt mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Product Info */}
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="text-2xl font-semibold text-white mb-3">
+                      {product.name}
+                    </h3>
+                    <p className="text-text-muted leading-relaxed mb-6 flex-1">
+                      {product.description}
+                    </p>
 
-                  {/* Price and CTA */}
-                  <div className="pt-4 space-y-4">
-                    <div className="text-center">
-                      <span className="text-3xl font-bold text-white">
-                        {product.price}
-                      </span>
-                    </div>
-                    
-                    {product.available ? (
-                      <div className="space-y-2">
-                        <button 
-                          onClick={() => handleAddToCart(product)}
-                          className="w-full px-6 py-3 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all group-hover:scale-105"
-                        >
-                          Add to Cart — {product.price}
-                        </button>
-                        <a 
-                          href={`/product/${product.id}`}
-                          className="block w-full px-6 py-2 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all text-center"
-                        >
-                          View Details
-                        </a>
+                    {/* Features */}
+                    {product.features && product.features.length > 0 && (
+                      <div className="mb-6">
+                        <ul className="space-y-2">
+                          {product.features.slice(0, 3).map((feature: string, index: number) => (
+                            <li key={index} className="flex items-center text-sm text-text-muted">
+                              <svg className="w-4 h-4 text-brand mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    ) : (
-                      <button 
-                        disabled
-                        className="w-full px-6 py-3 rounded-xl bg-gray-600 text-gray-300 font-semibold cursor-not-allowed"
-                      >
-                        Coming Soon
-                      </button>
                     )}
+
+                    {/* Price and CTA */}
+                    <div className="pt-4 space-y-4">
+                      <div className="text-center">
+                        <span className="text-3xl font-bold text-white">
+                          {product.price_isk ? `${product.price_isk} ISK` : (product.price || t('price_on_request'))}
+                        </span>
+                      </div>
+                      
+                      {product.available !== false ? (
+                        <div className="space-y-2">
+                          <Link 
+                            href={`/checkout?product=${product.id}&qty=1`}
+                            className="w-full block text-center px-6 py-3 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all group-hover:scale-105"
+                          >
+                            {t('buy_now')} — {product.price_isk ? `${product.price_isk} ISK` : (product.price || t('price_tbd'))}
+                          </Link>
+                          <button 
+                            onClick={() => handleAddToCart(product)}
+                            className="w-full px-6 py-2 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all"
+                          >
+                            {t('add_to_cart')}
+                          </button>
+                          <Link 
+                            href={`/product/${product.id}`}
+                            className="w-full block text-center px-6 py-2 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all"
+                          >
+                            {t('view_details')}
+                          </Link>
+                        </div>
+                      ) : (
+                        <button 
+                          disabled
+                          className="w-full px-6 py-3 rounded-xl bg-gray-600 text-gray-300 font-semibold cursor-not-allowed"
+                        >
+                          {t('coming_soon')}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Benefits Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-brand/8 rounded-full blur-blob" />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-              Why Choose Balans?
-            </h2>
-            <p className="text-lg text-text-muted max-w-2xl mx-auto">
-              Our testing kits are designed with your convenience and accuracy in mind.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-brand/20 flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white">Lab Certified</h3>
-              <p className="text-text-muted">
-                All tests processed by certified partner laboratories with validated methodologies.
+          {/* Database Status */}
+          {error && (
+            <div className="mt-8 text-center">
+              <p className="text-sm text-yellow-400">
+                {t('fallback_products_note')}: {error}
               </p>
             </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-brand-alt/20 flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-brand-alt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white">100% Private</h3>
-              <p className="text-text-muted">
-                Your results are encrypted and only accessible through your secure dashboard.
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white">Fast Results</h3>
-              <p className="text-text-muted">
-                Get your comprehensive results and recommendations in just 3-5 business days.
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

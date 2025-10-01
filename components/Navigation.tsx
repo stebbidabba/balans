@@ -1,11 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '../contexts/CartContext'
+import { createClient } from '../lib/supabase-client'
+import type { User } from '@supabase/supabase-js'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { state, dispatch } = useCart()
+  const [user, setUser] = useState<User | null>(null)
+  const [mounted, setMounted] = useState(false)
+  const { t, lang, setLang } = useI18n()
+
+  useEffect(() => {
+    const supabase = createClient()
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Avoid hydration mismatches for elements depending on client-only state
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-transparent backdrop-blur-sm border-b border-white/10">
@@ -26,7 +53,7 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <div className="relative group">
               <button className="text-white hover:text-brand transition-colors flex items-center space-x-1">
-                <span>Product</span>
+                <span>{t('nav_product')}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -47,17 +74,17 @@ export default function Navigation() {
             </div>
             
             <a href="/shop" className="text-white hover:text-brand transition-colors">
-              Shop
+              {t('nav_shop')}
             </a>
             
             <a href="/results" className="text-white hover:text-brand transition-colors">
-              Process & Results
+              {t('nav_results')}
             </a>
             
             {/* About Dropdown */}
             <div className="relative group">
               <button className="text-white hover:text-brand transition-colors flex items-center space-x-1">
-                <span>About</span>
+                <span>{t('nav_about')}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -65,31 +92,49 @@ export default function Navigation() {
               <div className="absolute top-full left-0 mt-2 w-40 bg-bg-card rounded-xl border border-white/10 shadow-soft opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="p-2">
                   <a href="/about" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                    The Company
+                    {t('nav_company')}
                   </a>
                   <a href="/lab" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                    The Lab
+                    {t('nav_lab')}
                   </a>
                 </div>
               </div>
             </div>
             
             <a href="/contact" className="text-white hover:text-brand transition-colors">
-              Contact
+              {t('nav_contact')}
             </a>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <a href="/login" className="text-text-muted hover:text-white transition-colors">
-              Log in
-            </a>
+            {user ? (
+              <a href="/account" className="text-text-muted hover:text-white transition-colors">
+                {t('nav_account')}
+              </a>
+            ) : (
+              <>
+                <a href="/login" className="text-text-muted hover:text-white transition-colors">
+                  {t('nav_login')}
+                </a>
+                <a href="/signup" className="text-text-muted hover:text-white transition-colors">
+                  {t('nav_signup')}
+                </a>
+              </>
+            )}
+            {/* Language toggle */}
+            <button
+              onClick={() => setLang(lang === 'en' ? 'is' : 'en')}
+              className="px-3 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors"
+            >
+              {lang === 'en' ? 'IS' : 'EN'}
+            </button>
             <button 
               onClick={() => dispatch({ type: 'TOGGLE_CART' })}
               className="px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all relative"
             >
-              Cart
-              {state.items.length > 0 && (
+              {t('nav_cart')}
+              {mounted && state.items.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {state.items.length}
                 </span>
@@ -131,35 +176,46 @@ export default function Navigation() {
                 </div>
               </div>
               <a href="/shop" className="block text-white">
-                Shop
+                {t('nav_shop')}
               </a>
               <a href="/results" className="block text-white">
-                Process & Results
+                {t('nav_results')}
               </a>
               <div>
-                <div className="text-white font-medium mb-2">About</div>
+                <div className="text-white font-medium mb-2">{t('nav_about')}</div>
                 <div className="pl-4 space-y-2">
                   <a href="/about" className="block text-text-muted hover:text-white">
-                    The Company
+                    {t('nav_company')}
                   </a>
                   <a href="/lab" className="block text-text-muted hover:text-white">
-                    The Lab
+                    {t('nav_lab')}
                   </a>
                 </div>
               </div>
               <a href="/contact" className="block text-white">
-                Contact
+                {t('nav_contact')}
               </a>
               <div className="pt-4 space-y-2">
-                <a href="/login" className="block w-full text-left text-text-muted hover:text-white">
-                  Log in
-                </a>
+                {user ? (
+                  <a href="/account" className="block w-full text-left text-text-muted hover:text-white">
+                    {t('nav_account')}
+                  </a>
+                ) : (
+                  <>
+                    <a href="/login" className="block w-full text-left text-text-muted hover:text-white">
+                      {t('nav_login')}
+                    </a>
+                    <a href="/signup" className="block w-full text-left text-text-muted hover:text-white">
+                      {t('nav_signup')}
+                    </a>
+                  </>
+                )}
                 <button 
                   onClick={() => dispatch({ type: 'TOGGLE_CART' })}
                   className="w-full px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button relative"
                 >
                   Cart
-                  {state.items.length > 0 && (
+                  {mounted && state.items.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {state.items.length}
                     </span>

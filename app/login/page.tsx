@@ -1,11 +1,61 @@
-import { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Sign In | Balans',
-  description: 'Sign in to your Balans account to access your hormone testing results and personalized health insights.',
-}
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase-client'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const router = useRouter()
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({ 
+      email, 
+      password 
+    })
+    
+    setLoading(false)
+    
+    if (error) {
+      setError(error.message)
+    } else {
+      router.push('/account')
+    }
+  }
+
+  const handleMagicLink = async () => {
+    if (!email) {
+      setError('Please enter your email first')
+      return
+    }
+    
+    setLoading(true)
+    setError('')
+    
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOtp({ 
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+    })
+    
+    setLoading(false)
+    
+    if (error) {
+      setError(error.message)
+    } else {
+      setMessage('Check your email for a magic link!')
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background blur effects */}
@@ -40,8 +90,20 @@ export default function LoginPage() {
               </h1>
             </div>
 
+            {/* Error/Success Messages */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            {message && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                {message}
+              </div>
+            )}
+
             {/* Login Form */}
-            <form className="space-y-6">
+            <form onSubmit={handleEmailLogin} className="space-y-6">
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -53,6 +115,8 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
                 />
@@ -63,52 +127,44 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all pr-12"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Forgot Password Link */}
-              <div className="text-left">
-                <a 
-                  href="/forgot-password" 
-                  className="text-sm text-brand hover:text-brand/80 transition-colors"
-                >
-                  Forgot password?
-                </a>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+                />
               </div>
 
               {/* Log In Button */}
               <button
                 type="submit"
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={loading}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
               >
-                Log in
+                {loading ? 'Signing in...' : 'Log in'}
               </button>
             </form>
+
+            {/* Magic Link Option */}
+            <div className="mt-4">
+              <button
+                onClick={handleMagicLink}
+                disabled={loading}
+                className="w-full bg-white hover:bg-gray-50 text-gray-900 font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 disabled:opacity-50"
+              >
+                {loading ? 'Sending...' : 'Send magic link'}
+              </button>
+            </div>
 
             {/* Sign Up Button */}
             <div className="mt-4">
               <a
                 href="/signup"
-                className="w-full block text-center bg-white hover:bg-gray-50 text-gray-900 font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200"
+                className="w-full block text-center bg-brand hover:bg-brand/90 text-black font-medium py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Sign up
               </a>

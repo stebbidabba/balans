@@ -2,10 +2,12 @@
 
 import { useCart } from '../contexts/CartContext'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function CartSidebar() {
   const { state, dispatch } = useCart()
   const router = useRouter()
+  const { t } = useI18n()
 
   if (!state.isOpen) return null
 
@@ -20,8 +22,16 @@ export default function CartSidebar() {
   const handleCheckout = () => {
     console.log('Checkout clicked, current cart state:', state)
     dispatch({ type: 'CLOSE_CART' })
-    // Use Next.js router to preserve React state
-    router.push('/checkout')
+    
+    // If cart has items, go to checkout with cart flag
+    if (state.items.length > 0) {
+      // For now, use the first item but indicate it's from cart
+      const firstItem = state.items[0]
+      router.push(`/checkout?product=${firstItem.id}&qty=${firstItem.quantity}&cart=true`)
+    } else {
+      // If cart is empty, go to shop
+      router.push('/shop')
+    }
   }
 
   return (
@@ -37,7 +47,7 @@ export default function CartSidebar() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <h2 className="text-xl font-semibold text-white">YOUR BAG</h2>
+            <h2 className="text-xl font-semibold text-white">{t('your_bag')}</h2>
             <button
               onClick={() => dispatch({ type: 'CLOSE_CART' })}
               className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
@@ -52,18 +62,18 @@ export default function CartSidebar() {
           <div className="flex-1 overflow-y-auto p-6">
             {state.items.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-text-muted mb-4">Your bag is empty</p>
+                <p className="text-text-muted mb-4">{t('cart_is_empty')}</p>
                 <button
                   onClick={() => dispatch({ type: 'CLOSE_CART' })}
                   className="text-brand hover:text-brand/80 font-medium"
                 >
-                  Continue shopping
+                  {t('continue_shopping')}
                 </button>
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="text-sm text-text-muted mb-4">
-                  TOTAL: ({state.items.length} {state.items.length === 1 ? 'item' : 'items'}) ${state.total.toFixed(2)}
+                  {t('total')}: ({state.items.length} {state.items.length === 1 ? t('item') : t('items')}) ${state.total.toFixed(2)}
                 </div>
                 <p className="text-sm text-text-muted/70 mb-6">
                   Items in your bag are not reserved — check out now to make them yours.
@@ -140,7 +150,7 @@ export default function CartSidebar() {
                 onClick={handleCheckout}
                 className="w-full bg-brand hover:bg-brand/90 text-black font-semibold py-4 rounded-xl transition-colors flex items-center justify-center shadow-button"
               >
-                CHECKOUT
+                {t('checkout')}
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>

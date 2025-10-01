@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function Footer() {
   const [email, setEmail] = useState('')
+  const { t } = useI18n()
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -16,28 +18,28 @@ export default function Footer() {
     {
       title: "Balans",
       links: [
-        { label: "Testosterone Kit", href: "/product/testosterone" },
-        { label: "Stress & Energy Kit", href: "/product/stress-energy" },
-        { label: "How it works", href: "#how" },
-        { label: "Science", href: "/science" },
-        { label: "FAQ", href: "#faq" }
+        { label: t('footer_testosterone') || "Testosterone Kit", href: "/product/testosterone" },
+        { label: t('footer_stress_energy') || "Stress & Energy Kit", href: "/product/stress-energy" },
+        { label: t('footer_how') || "How it works", href: "#how" },
+        { label: t('footer_science') || "Science", href: "/science" },
+        { label: t('footer_faq') || "FAQ", href: "#faq" }
       ]
     },
     {
-      title: "Company",
+      title: t('footer_company') || "Company",
       links: [
-        { label: "About", href: "/about" },
-        { label: "Contact", href: "/contact" },
-        { label: "Careers", href: "/careers" },
-        { label: "News", href: "/news" }
+        { label: t('footer_about') || "About", href: "/about" },
+        { label: t('footer_contact') || "Contact", href: "/contact" },
+        { label: t('footer_careers') || "Careers", href: "/careers" },
+        { label: t('footer_news') || "News", href: "/news" }
       ]
     },
     {
-      title: "Resources",
+      title: t('footer_resources') || "Resources",
       links: [
-        { label: "Insights", href: "/insights" },
-        { label: "Guides", href: "/guides" },
-        { label: "Support", href: "/support" }
+        { label: t('footer_insights') || "Insights", href: "/insights" },
+        { label: t('footer_guides') || "Guides", href: "/guides" },
+        { label: t('footer_support') || "Support", href: "/support" }
       ]
     }
   ]
@@ -88,13 +90,13 @@ export default function Footer() {
             {/* Contact Card */}
             <div className="space-y-4">
               <h3 className="text-lg leading-[1.2] text-text-muted font-medium">
-                Have questions?
+                {t('footer_have_questions') || 'Have questions?'}
               </h3>
               <a
                 href="/contact"
                 className="block w-full h-14 rounded-xl bg-brand text-black font-semibold shadow-button hover:opacity-90 transition-all flex items-center justify-center"
               >
-                Contact us
+                {t('footer_contact_us') || 'Contact us'}
               </a>
             </div>
 
@@ -102,10 +104,10 @@ export default function Footer() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg leading-[1.2] text-text-muted font-medium mb-2">
-                  Get updates
+                  {t('footer_get_updates') || 'Get updates'}
                 </h3>
                 <p className="text-text-muted text-sm">
-                  Drop us your email to learn what's next.
+                  {t('footer_email_prompt') || "Drop us your email to learn what's next."}
                 </p>
               </div>
               
@@ -115,7 +117,7 @@ export default function Footer() {
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
+                  placeholder={t('footer_email_placeholder') || 'your@email.com'}
                   className="w-full h-14 rounded-xl bg-white/10 backdrop-blur border border-white/20 px-5 pr-14 text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
                   required
                 />
@@ -147,7 +149,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <p className="text-xs text-text-muted">
-              © Balans. All rights reserved.
+              {t('footer_copyright') || '© Balans. All rights reserved.'}
             </p>
 
             {/* Legal Links */}
@@ -156,13 +158,13 @@ export default function Footer() {
                 href="/privacy"
                 className="text-xs text-text-muted hover:text-text-primary transition-colors"
               >
-                Privacy policy
+                {t('footer_privacy') || 'Privacy policy'}
               </a>
               <a
                 href="/terms"
                 className="text-xs text-text-muted hover:text-text-primary transition-colors"
               >
-                Terms of service
+                {t('footer_terms') || 'Terms of service'}
               </a>
             </div>
           </div>

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function Hero() {
   const [email, setEmail] = useState('')
+  const { t } = useI18n()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,13 +37,13 @@ export default function Hero() {
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Headline */}
           <h1 className="text-5xl md:text-6xl font-semibold leading-tight text-white">
-            The all-in-one home testing platform for{' '}
-            <span className="gradient-text">hormone health</span>
+            {t('hero_headline_1') || 'The all-in-one home testing platform for'}{' '}
+            <span className="gradient-text">{t('hero_headline_2') || 'hormone health'}</span>
           </h1>
           
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto">
-            Order an at-home kit, send your sample, and get clear results — all under your own private dashboard.
+            {t('hero_subheadline') || 'Order an at-home kit, send your sample, and get clear results — all under your own private dashboard.'}
           </p>
           
           {/* Email Form */}
@@ -51,7 +53,7 @@ export default function Hero() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
+                placeholder={t('email_address') || 'Enter your email address'}
                 className="w-full md:w-[320px] h-12 rounded-xl px-4 bg-white/10 backdrop-blur border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
                 required
               />
@@ -59,11 +61,11 @@ export default function Hero() {
                 type="submit"
                 className="w-full md:w-auto h-12 px-6 rounded-xl bg-brand text-black font-semibold hover:opacity-90 shadow-button transition-all whitespace-nowrap"
               >
-                Get started
+                {t('get_started') || 'Get started'}
               </button>
             </form>
             <p className="text-sm text-text-muted mt-3">
-              No spam. Cancel anytime.
+              {t('no_spam') || 'No spam. Cancel anytime.'}
             </p>
           </div>
         </div>
