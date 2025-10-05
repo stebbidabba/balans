@@ -11,6 +11,16 @@ export default function CartSidebar() {
 
   if (!state.isOpen) return null
 
+  const formatI18n = (value: any) => {
+    const text = String(value ?? '')
+    if (!text) return ''
+    if (text.includes('_') && !text.includes(' ')) {
+      const spaced = text.replace(/_/g, ' ')
+      return spaced.replace(/\b\w/g, (m) => m.toUpperCase())
+    }
+    return text
+  }
+
   const updateQuantity = (id: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } })
   }
@@ -96,10 +106,10 @@ export default function CartSidebar() {
                     </div>
                     
                     <div className="flex-1">
-                      <h3 className="font-medium text-white mb-1">{item.name}</h3>
+                      <h3 className="font-medium text-white mb-1">{formatI18n(item.name)}</h3>
                       <p className="text-lg font-semibold text-brand">${item.price}</p>
                       {item.variant && (
-                        <p className="text-sm text-text-muted">{item.variant}</p>
+                        <p className="text-sm text-text-muted">{formatI18n(item.variant)}</p>
                       )}
                       
                       <div className="flex items-center gap-2 mt-3">
