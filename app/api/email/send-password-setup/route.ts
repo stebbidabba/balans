@@ -8,6 +8,18 @@ export async function POST(request: NextRequest) {
     if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
 
     const supabase = supabaseAdmin()
+    // Ensure a user exists for this email (recovery links require an existing user)
+    try {
+      const { error: createErr } = await supabase.auth.admin.createUser({
+        email,
+        email_confirm: true
+      })
+      if (createErr && !createErr.message?.includes('already registered')) {
+        console.log('Create user (ignored if exists) error:', createErr.message)
+      }
+    } catch (e) {
+      console.log('Create user exception (ignored):', e)
+    }
     // Generate a recovery link which lets the user set a password
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
