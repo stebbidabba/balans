@@ -23,7 +23,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
     }
 
     // Try to create order in Supabase first
-    let orderId;
+    let orderId: string;
     try {
       const { data: order, error: orderError } = await supabase
         .from('orders')
