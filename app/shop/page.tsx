@@ -138,6 +138,101 @@ export default function ShopPage() {
     }
   ]
 
+  const formatI18n = (value: any) => {
+    const text = String(value ?? '')
+    if (!text) return ''
+    // If looks like a key (snake_case), make it human-friendly
+    if (text.includes('_') && !text.includes(' ')) {
+      const spaced = text.replace(/_/g, ' ')
+      return spaced.replace(/\b\w/g, (m) => m.toUpperCase())
+    }
+    return text
+  }
+
+  const renderProductIcon = (product: any) => {
+    const name = String(product.name || '').toLowerCase()
+    const isUnavailable = product.available === false
+
+    let type: 'testosterone' | 'stress' | 'complete' | 'women' | 'generic' = 'generic'
+    if (name.includes('testosterone')) type = 'testosterone'
+    else if (name.includes('stress') || name.includes('energy')) type = 'stress'
+    else if (name.includes('complete') || name.includes('panel')) type = 'complete'
+    else if (name.includes('women')) type = 'women'
+
+    const gradientClass =
+      type === 'testosterone'
+        ? 'from-amber-300/30 via-orange-400/20 to-rose-400/30'
+        : type === 'stress'
+        ? 'from-emerald-300/30 via-cyan-300/25 to-sky-400/30'
+        : type === 'complete'
+        ? 'from-purple-400/30 via-fuchsia-400/20 to-indigo-400/30'
+        : type === 'women'
+        ? 'from-pink-300/30 via-rose-300/25 to-purple-300/30'
+        : 'from-brand/25 via-purple-400/20 to-blue-400/25'
+
+    const iconColor = isUnavailable ? 'text-white/40' : 'text-white'
+
+    const iconSize = 'w-10 h-10'
+
+    // Icons are simple, crisp, and semantic per kit type
+    const Icon = () => {
+      if (type === 'testosterone') {
+        // Atom-style icon
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M2 12c0-2.21 4.477-4 10-4s10 1.79 10 4-4.477 4-10 4-10-1.79-10-4z"/>
+            <path d="M6.5 4.5c1.558-1.558 6.15.084 10.269 4.203 4.118 4.118 5.76 8.711 4.203 10.269-1.558 1.558-6.151-.085-10.269-4.203C6.585 10.65 4.943 6.058 6.5 4.5z"/>
+            <path d="M17.5 4.5c-1.558-1.558-6.151.085-10.269 4.203C3.113 12.821 1.471 17.414 3.029 18.971c1.558 1.558 6.151-.085 10.269-4.203C17.915 10.65 19.557 6.058 17.5 4.5z"/>
+          </svg>
+        )
+      }
+      if (type === 'stress') {
+        // Bolt/energy icon
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/>
+          </svg>
+        )
+      }
+      if (type === 'complete') {
+        // Analytics/graph icon
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M3 21h18"/>
+            <rect x="4" y="12" width="3" height="6" rx="1"/>
+            <rect x="10.5" y="9" width="3" height="9" rx="1"/>
+            <rect x="17" y="6" width="3" height="12" rx="1"/>
+          </svg>
+        )
+      }
+      if (type === 'women') {
+        // Venus/female icon
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="12" cy="7" r="5"/>
+            <path d="M12 12v10M9 19h6"/>
+          </svg>
+        )
+      }
+      // Generic beaker
+      return (
+        <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M9 2v5l-5.5 9.5A4 4 0 0 0 7.9 22h8.2a4 4 0 0 0 3.4-5.5L14 7V2"/>
+          <path d="M7 15h10"/>
+        </svg>
+      )
+    }
+
+    return (
+      <div className={`relative mb-7 flex items-center justify-center`}>
+        <div className={`h-28 w-28 rounded-2xl bg-gradient-to-br ${gradientClass} border border-white/10 shadow-inner flex items-center justify-center ${isUnavailable ? 'grayscale opacity-70' : ''}`}>
+          <Icon />
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
@@ -215,22 +310,16 @@ export default function ShopPage() {
                     </div>
                   )}
 
-                  {/* Product Image */}
-                  <div className="mb-6 flex justify-center">
-                    <img 
-                      src={product.image_url || product.image || '/testkit.png'} 
-                      alt={product.name}
-                      className={`h-32 w-auto object-contain ${product.available === false ? 'grayscale opacity-60' : ''}`}
-                    />
-                  </div>
+                  {/* Product Icon */}
+                  {renderProductIcon(product)}
 
                   {/* Product Info */}
                   <div className="flex-1 flex flex-col">
                     <h3 className="text-2xl font-semibold text-white mb-3">
-                      {product.name}
+                      {formatI18n(product.name)}
                     </h3>
                     <p className="text-text-muted leading-relaxed mb-6 flex-1">
-                      {product.description}
+                      {formatI18n(product.description)}
                     </p>
 
                     {/* Features */}
@@ -242,7 +331,7 @@ export default function ShopPage() {
                               <svg className="w-4 h-4 text-brand mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
-                              {feature}
+                              {formatI18n(feature)}
                             </li>
                           ))}
                         </ul>

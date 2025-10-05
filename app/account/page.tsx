@@ -60,7 +60,7 @@ export default async function AccountPage() {
                     View My Orders
                   </Link>
                   <Link 
-                    href="/results"
+                    href="/account/results"
                     className="px-6 py-3 bg-brand/20 text-brand border border-brand/30 rounded-xl hover:bg-brand/30 transition-all"
                   >
                     View My Results

@@ -5,6 +5,81 @@ import { useI18n } from '@/contexts/I18nContext'
 export default function FeatureCards() {
   const { t } = useI18n()
   
+  const formatI18n = (value: any) => {
+    const text = String(value ?? '')
+    if (!text) return ''
+    if (text.includes('_') && !text.includes(' ')) {
+      const spaced = text.replace(/_/g, ' ')
+      return spaced.replace(/\b\w/g, (m) => m.toUpperCase())
+    }
+    return text
+  }
+
+  const renderCardIcon = (title: string) => {
+    const name = String(title || '').toLowerCase()
+    let type: 'testosterone' | 'stress' | 'complete' | 'generic' = 'generic'
+    if (name.includes('testosterone')) type = 'testosterone'
+    else if (name.includes('stress') || name.includes('energy')) type = 'stress'
+    else if (name.includes('complete') || name.includes('panel')) type = 'complete'
+
+    const gradientClass =
+      type === 'testosterone'
+        ? 'from-amber-300/30 via-orange-400/20 to-rose-400/30'
+        : type === 'stress'
+        ? 'from-emerald-300/30 via-cyan-300/25 to-sky-400/30'
+        : type === 'complete'
+        ? 'from-purple-400/30 via-fuchsia-400/20 to-indigo-400/30'
+        : 'from-brand/25 via-purple-400/20 to-blue-400/25'
+
+    const iconColor = 'text-white'
+    const iconSize = 'w-10 h-10'
+
+    const Icon = () => {
+      if (type === 'testosterone') {
+        // Atom-style icon
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M2 12c0-2.21 4.477-4 10-4s10 1.79 10 4-4.477 4-10 4-10-1.79-10-4z"/>
+            <path d="M6.5 4.5c1.558-1.558 6.15.084 10.269 4.203 4.118 4.118 5.76 8.711 4.203 10.269-1.558 1.558-6.151-.085-10.269-4.203C6.585 10.65 4.943 6.058 6.5 4.5z"/>
+            <path d="M17.5 4.5c-1.558-1.558-6.151.085-10.269 4.203C3.113 12.821 1.471 17.414 3.029 18.971c1.558 1.558 6.151-.085 10.269-4.203C17.915 10.65 19.557 6.058 17.5 4.5z"/>
+          </svg>
+        )
+      }
+      if (type === 'stress') {
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/>
+          </svg>
+        )
+      }
+      if (type === 'complete') {
+        return (
+          <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M3 21h18"/>
+            <rect x="4" y="12" width="3" height="6" rx="1"/>
+            <rect x="10.5" y="9" width="3" height="9" rx="1"/>
+            <rect x="17" y="6" width="3" height="12" rx="1"/>
+          </svg>
+        )
+      }
+      return (
+        <svg className={`${iconSize} ${iconColor}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M9 2v5l-5.5 9.5A4 4 0 0 0 7.9 22h8.2a4 4 0 0 0 3.4-5.5L14 7V2"/>
+          <path d="M7 15h10"/>
+        </svg>
+      )
+    }
+
+    return (
+      <div className="w-full h-48 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
+        <div className={`h-28 w-28 rounded-2xl bg-gradient-to-br ${gradientClass} border border-white/10 shadow-inner flex items-center justify-center`}>
+          <Icon />
+        </div>
+      </div>
+    )
+  }
+
   const cards = [
     {
       title: t('testosterone_kit'),
@@ -70,23 +145,17 @@ export default function FeatureCards() {
               key={index}
               className="glass-card rounded-xl p-8 shadow-soft hover:shadow-xl transition-all duration-300 group"
             >
-              {/* Card Image */}
-              <div className="w-full h-48 bg-gradient-to-br from-brand/20 to-brand-alt/20 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={card.image} 
-                  alt={card.title}
-                  className="w-full h-full object-contain p-4"
-                />
-              </div>
+              {/* Card Icon */}
+            {renderCardIcon(card.title as unknown as string)}
 
               {/* Card Content */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-white">
-                  {card.title}
+                  {formatI18n(card.title)}
                 </h3>
                 
                 <p className="text-text-muted leading-relaxed">
-                  {card.desc}
+                  {formatI18n(card.desc)}
                 </p>
 
                 {/* Bullet Points */}

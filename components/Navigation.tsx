@@ -81,25 +81,9 @@ export default function Navigation() {
               {t('nav_results')}
             </a>
             
-            {/* About Dropdown */}
-            <div className="relative group">
-              <button className="text-white hover:text-brand transition-colors flex items-center space-x-1">
-                <span>{t('nav_about')}</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-40 bg-bg-card rounded-xl border border-white/10 shadow-soft opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="p-2">
-                  <a href="/about" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                    {t('nav_company')}
-                  </a>
-                  <a href="/lab" className="block px-3 py-2 text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                    {t('nav_lab')}
-                  </a>
-                </div>
-              </div>
-            </div>
+            <a href="/about" className="text-white hover:text-brand transition-colors">
+              {t('nav_about')}
+            </a>
             
             <a href="/contact" className="text-white hover:text-brand transition-colors">
               {t('nav_contact')}
@@ -181,17 +165,9 @@ export default function Navigation() {
               <a href="/results" className="block text-white">
                 {t('nav_results')}
               </a>
-              <div>
-                <div className="text-white font-medium mb-2">{t('nav_about')}</div>
-                <div className="pl-4 space-y-2">
-                  <a href="/about" className="block text-text-muted hover:text-white">
-                    {t('nav_company')}
-                  </a>
-                  <a href="/lab" className="block text-text-muted hover:text-white">
-                    {t('nav_lab')}
-                  </a>
-                </div>
-              </div>
+              <a href="/about" className="block text-white">
+                {t('nav_about')}
+              </a>
               <a href="/contact" className="block text-white">
                 {t('nav_contact')}
               </a>

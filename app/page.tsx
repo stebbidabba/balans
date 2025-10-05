@@ -4,6 +4,7 @@ import TimelineCurve from '@/components/TimelineCurve'
 import FeatureCards from '@/components/FeatureCards'
 import HowItWorks from '@/components/HowItWorks'
 import AppShowcase from '@/components/AppShowcase'
+import HormoneImportance from '@/components/HormoneImportance'
 import FAQ from '@/components/FAQ'
 import Footer from '@/components/Footer'
 
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <TimelineCurve />
       <FeatureCards />
+      <HormoneImportance />
       <HowItWorks />
       <AppShowcase />
       <FAQ />
