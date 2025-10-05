@@ -22,9 +22,36 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
       totalAmount = (fallbackProducts[productId]?.price_isk || 12900) * quantity;
     }
 
-    // Try to create order in Supabase first
+    // Try to create order in Supabase first (only if we have a userId)
     let orderId: string;
     try {
+      if (!userId) {
+        // Anonymous checkout: skip Supabase and use local fallback directly
+        orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const orderData = {
+          id: orderId,
+          email: email,
+          products: products || [{ id: productId, quantity }],
+          status: 'pending_payment',
+          total_amount: totalAmount,
+          created_at: new Date().toISOString(),
+        };
+        try {
+          const fs = require('fs');
+          const path = require('path');
+          const ordersFile = path.join(process.cwd(), 'orders.json');
+          let orders = [];
+          if (fs.existsSync(ordersFile)) {
+            const data = fs.readFileSync(ordersFile, 'utf8');
+            orders = JSON.parse(data);
+          }
+          orders.push(orderData);
+          fs.writeFileSync(ordersFile, JSON.stringify(orders, null, 2));
+          console.log(`Order saved locally (anon): ${orderId} for ${email}`);
+        } catch (fileError) {
+          console.log('Failed to save anon order locally:', fileError);
+        }
+      } else {
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -179,6 +206,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
             }
           }
         }
+      }
       }
     } catch (err) {
       console.log('Order creation error:', err);
