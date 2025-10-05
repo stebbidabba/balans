@@ -146,7 +146,7 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
   );
 }
 
-export default function StripeCheckoutClient({ clientSecret, orderId }: { clientSecret: string; orderId: string }) {
+export default function StripeCheckoutClient({ clientSecret, orderId, email }: { clientSecret: string; orderId: string; email: string }) {
   // If using mock key (no real Stripe), show simulated success flow to avoid client-side errors
   if (IS_MOCK) {
     return (
@@ -201,7 +201,7 @@ export default function StripeCheckoutClient({ clientSecret, orderId }: { client
 
   return (
     <Elements stripe={stripePromise} options={options}>
-      <PaymentForm clientSecret={clientSecret} orderId={orderId} />
+      <PaymentForm clientSecret={clientSecret} orderId={orderId} email={email} />
     </Elements>
   );
 }
