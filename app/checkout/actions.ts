@@ -239,6 +239,20 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     console.log(`Order created: ${orderId} for ${email}`);
+    // Send password setup email for guest users
+    try {
+      if (!userId && email) {
+        const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
+        const supabase = supabaseAdmin()
+        await supabase.auth.admin.generateLink({
+          type: 'recovery',
+          email,
+          options: { redirectTo: `${site}/auth/callback?next=/account` }
+        } as any)
+      }
+    } catch (e) {
+      console.log('Non-blocking: failed to trigger password setup email', e)
+    }
     
     return {
       provider: "stripe",
