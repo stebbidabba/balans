@@ -11,7 +11,7 @@ export function getResend() {
 export async function sendTestEmail(to: string) {
   const resend = getResend()
   return await resend.emails.send({
-    from: 'onboarding@resend.dev',
+    from: 'Balans <info@balansisland.is>',
     to,
     subject: 'Hello from Balans',
     html: '<p>Congrats on sending your <strong>first email</strong> via Resend!</p>'
