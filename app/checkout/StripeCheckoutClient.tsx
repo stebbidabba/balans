@@ -4,7 +4,9 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 
 // Mock Stripe for development - in production, use real Stripe keys
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key");
+const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key";
+const IS_MOCK = PUBLISHABLE_KEY === "pk_test_mock_key";
+const stripePromise = loadStripe(PUBLISHABLE_KEY);
 
 function PaymentForm({ clientSecret, orderId }: { clientSecret: string; orderId: string }) {
   const stripe = useStripe();
@@ -138,8 +140,8 @@ function PaymentForm({ clientSecret, orderId }: { clientSecret: string; orderId:
 }
 
 export default function StripeCheckoutClient({ clientSecret, orderId }: { clientSecret: string; orderId: string }) {
-  // For development with mock client secrets, skip Stripe Elements
-  if (clientSecret.includes('pi_') && !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')) {
+  // If using mock key (no real Stripe), show simulated success flow to avoid client-side errors
+  if (IS_MOCK) {
     return (
       <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
         <div className="text-center">
