@@ -36,11 +36,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform the data to include products array and kit codes
-    const transformedOrders = orders.map(order => {
+    const transformedOrders = orders.map((order: any) => {
       // If no order_items, create fallback product data
       let products = []
       if (order.order_items && order.order_items.length > 0) {
-        products = order.order_items.map(item => ({
+        products = order.order_items.map((item: any) => ({
           name: item.products?.name || 'Unknown Product',
           description: item.products?.description || '',
           quantity: item.quantity,
