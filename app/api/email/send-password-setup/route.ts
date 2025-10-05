@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServer } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { sendPasswordSetupEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { email } = await request.json()
     if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
 
-    const supabase = supabaseServer()
+    const supabase = supabaseAdmin()
     // Generate a recovery link which lets the user set a password
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
