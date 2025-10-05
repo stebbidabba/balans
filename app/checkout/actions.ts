@@ -7,6 +7,24 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
   
   try {
     const supabase = supabaseAdmin();
+    // Ensure we have a user to associate with the order. If not logged in, create a guest user.
+    let effectiveUserId = userId;
+    try {
+      if (!effectiveUserId && email) {
+        const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+          email: email,
+          email_confirm: true
+        });
+        if (!createErr && created?.user?.id) {
+          effectiveUserId = created.user.id;
+          console.log('Created guest user for order:', effectiveUserId);
+        } else if (createErr) {
+          console.log('Could not create guest user, will fallback to local file:', createErr.message);
+        }
+      }
+    } catch (e) {
+      console.log('Guest user creation exception:', e);
+    }
     
     // Calculate total amount
     let totalAmount = 0;
@@ -22,10 +40,10 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
       totalAmount = (fallbackProducts[productId]?.price_isk || 12900) * quantity;
     }
 
-    // Try to create order in Supabase first (only if we have a userId)
+    // Try to create order in Supabase first (guest or authenticated)
     let orderId: string;
     try {
-      if (!userId) {
+      if (!effectiveUserId) {
         // Anonymous checkout: skip Supabase and use local fallback directly
         orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const orderData = {
@@ -55,7 +73,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          user_id: userId,
+          user_id: effectiveUserId,
           email: email,
           status: 'pending_payment',
           total_amount: totalAmount,
@@ -76,7 +94,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
           status: 'pending_payment',
           total_amount: totalAmount,
           created_at: new Date().toISOString(),
-          user_id: userId
+          user_id: effectiveUserId
         };
         
         // Write to local orders file as fallback
