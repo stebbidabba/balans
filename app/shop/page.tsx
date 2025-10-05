@@ -36,6 +36,12 @@ export default function ShopPage() {
       try {
         console.log('Fetching products...')
         const supabase = createClient()
+        // If env vars are missing, supabase may be null (soft fallback)
+        if (!supabase) {
+          console.log('Supabase client not configured; using fallback products')
+          setProducts(fallbackProducts)
+          return
+        }
         const { data, error } = await supabase.from("products")
           .select("id, name, description, price_isk, sku, image_url")
           .eq("active", true)
