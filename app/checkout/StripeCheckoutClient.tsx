@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { sendPostPaymentEmails } from "./actions";
 
 // Mock Stripe for development - in production, use real Stripe keys
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key";
 const IS_MOCK = PUBLISHABLE_KEY === "pk_test_mock_key";
 const stripePromise = loadStripe(PUBLISHABLE_KEY);
 
-function PaymentForm({ clientSecret, orderId }: { clientSecret: string; orderId: string }) {
+function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; orderId: string; email: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [msg, setMsg] = useState("");
@@ -28,6 +29,12 @@ function PaymentForm({ clientSecret, orderId }: { clientSecret: string; orderId:
       await new Promise(resolve => setTimeout(resolve, 2000));
       setPaymentSuccess(true);
       setIsProcessing(false);
+      
+      // Send emails after successful payment
+      if (email) {
+        console.log('Sending post-payment emails...');
+        await sendPostPaymentEmails(email);
+      }
       return;
     }
     

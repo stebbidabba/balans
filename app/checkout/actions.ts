@@ -240,32 +240,6 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     console.log(`Order created: ${orderId} for ${email}`);
-    // Send access + password setup emails to the buyer (guest or logged-in)
-    try {
-      if (email) {
-        const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
-        const supabase = supabaseAdmin()
-        // Generate both recovery (set password) and magiclink (one-click sign in)
-        const { data: recData, error: recErr } = await supabase.auth.admin.generateLink({
-          type: 'recovery',
-          email,
-          options: { redirectTo: `${site}/auth/callback?next=/account` }
-        } as any)
-        if (!recErr && (recData as any)?.properties?.action_link) {
-          await sendPasswordSetupEmail(email, (recData as any).properties.action_link)
-        }
-        const { data: magicData, error: magicErr } = await supabase.auth.admin.generateLink({
-          type: 'magiclink',
-          email,
-          options: { redirectTo: `${site}/auth/callback?next=/account` }
-        } as any)
-        if (!magicErr && (magicData as any)?.properties?.action_link) {
-          await sendAccessLinkEmail(email, (magicData as any).properties.action_link)
-        }
-      }
-    } catch (e) {
-      console.log('Non-blocking: failed to trigger access/password emails', e)
-    }
     
     return {
       provider: "stripe",
@@ -278,5 +252,50 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
   } catch (error) {
     console.error('Payment creation failed:', error);
     throw new Error('Failed to create payment');
+  }
+}
+
+export async function sendPostPaymentEmails(email: string) {
+  try {
+    if (!email) {
+      console.log('No email provided for post-payment emails');
+      return;
+    }
+
+    const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
+    const supabase = supabaseAdmin()
+    
+    console.log(`Sending post-payment emails to: ${email}`);
+    
+    // Generate both recovery (set password) and magiclink (one-click sign in)
+    const { data: recData, error: recErr } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: { redirectTo: `${site}/auth/callback?next=/account` }
+    } as any)
+    
+    if (!recErr && (recData as any)?.properties?.action_link) {
+      console.log('Sending password setup email...');
+      await sendPasswordSetupEmail(email, (recData as any).properties.action_link)
+    } else {
+      console.log('Failed to generate recovery link:', recErr);
+    }
+    
+    const { data: magicData, error: magicErr } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${site}/auth/callback?next=/account` }
+    } as any)
+    
+    if (!magicErr && (magicData as any)?.properties?.action_link) {
+      console.log('Sending magic link email...');
+      await sendAccessLinkEmail(email, (magicData as any).properties.action_link)
+    } else {
+      console.log('Failed to generate magic link:', magicErr);
+    }
+    
+    console.log('Post-payment emails sent successfully');
+  } catch (e) {
+    console.error('Failed to send post-payment emails:', e);
   }
 }

@@ -281,7 +281,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Form */}
-            <StripeCheckoutClient clientSecret={clientSecret} orderId={orderId} />
+            <StripeCheckoutClient clientSecret={clientSecret} orderId={orderId} email={email} />
             
             {/* Account Creation Notice */}
             {!user && (
