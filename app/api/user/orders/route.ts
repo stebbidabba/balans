@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
 
 // Generate mock kit codes for orders
 function generateKitCodes(orderId: string, products: any[]): string[] {
-  const codes = []
+  const codes: string[] = []
   let kitIndex = 1
   
-  products.forEach(product => {
+  products.forEach((product: any) => {
     // Generate one kit code per quantity ordered
     for (let i = 0; i < product.quantity; i++) {
       const code = `KT-${orderId.slice(-6).toUpperCase()}-${String(kitIndex).padStart(2, '0')}`
