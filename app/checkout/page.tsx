@@ -77,21 +77,21 @@ export default function CheckoutPage() {
               name: 'hormone_test_kit',
               description: 'Complete hormone test kit',
               price_isk: 12900,
-              quantity: cartState.items.find(item => item.id === 1)?.quantity || 0
+              quantity: cartState.items.find(item => item.id === '1')?.quantity || 0
             },
             '2': {
               id: 2,
               name: 'stress_test_kit',
               description: 'Stress hormone test kit',
               price_isk: 14400,
-              quantity: cartState.items.find(item => item.id === 2)?.quantity || 0
+              quantity: cartState.items.find(item => item.id === '2')?.quantity || 0
             },
             '3': {
               id: 3,
               name: 'comprehensive_test_kit',
               description: 'Comprehensive hormone test kit',
               price_isk: 19900,
-              quantity: cartState.items.find(item => item.id === 3)?.quantity || 0
+              quantity: cartState.items.find(item => item.id === '3')?.quantity || 0
             }
           }
           
