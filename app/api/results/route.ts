@@ -69,9 +69,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform orders data
-    const transformedOrders = orders.map(order => ({
+    const transformedOrders = orders.map((order: any) => ({
       ...order,
-      products: order.order_items?.map(item => ({
+      products: order.order_items?.map((item: any) => ({
         name: item.products?.name || 'Unknown Product',
         description: item.products?.description || '',
         quantity: item.quantity,
