@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const email = searchParams.get('email')
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/account'
 
@@ -59,5 +60,6 @@ export async function GET(request: NextRequest) {
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  const errorUrl = email ? `/auth/auth-code-error?email=${encodeURIComponent(email)}` : '/auth/auth-code-error'
+  return NextResponse.redirect(`${origin}${errorUrl}`)
 }

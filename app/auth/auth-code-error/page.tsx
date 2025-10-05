@@ -1,4 +1,12 @@
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
 export default function AuthCodeError() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') || ''
+  const signupUrl = email ? `/signup?email=${encodeURIComponent(email)}` : '/signup'
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center">
@@ -11,7 +19,7 @@ export default function AuthCodeError() {
         <p className="text-gray-600 mb-6">You can create your account below — we'll send a fresh email.</p>
         <div className="space-x-4">
           <a
-            href="/signup"
+            href={signupUrl}
             className="inline-block px-6 py-3 bg-brand text-black font-medium rounded-xl hover:opacity-90 transition-opacity"
           >
             Go to Sign Up
