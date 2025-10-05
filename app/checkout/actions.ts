@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
+import { sendPasswordSetupEmail } from "@/lib/email";
 
 export async function createPaymentAction(args: { userId?: string; email?: string; products?: any[]; productId?: string; quantity?: number; isFromCart?: boolean }) {
   const { userId, email, products, productId, quantity = 1, isFromCart = false } = args;
@@ -244,11 +245,14 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
       if (!userId && email) {
         const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
         const supabase = supabaseAdmin()
-        await supabase.auth.admin.generateLink({
+        const { data, error } = await supabase.auth.admin.generateLink({
           type: 'recovery',
           email,
           options: { redirectTo: `${site}/auth/callback?next=/account` }
         } as any)
+        if (!error && (data as any)?.properties?.action_link) {
+          await sendPasswordSetupEmail(email, (data as any).properties.action_link)
+        }
       }
     } catch (e) {
       console.log('Non-blocking: failed to trigger password setup email', e)
