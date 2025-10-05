@@ -18,23 +18,39 @@ export async function sendTestEmail(to: string) {
   })
 }
 
-export async function sendPasswordSetupEmail(to: string, link: string) {
+export async function sendAccountSetupEmail(to: string, link: string) {
   const resend = getResend()
   const html = `
-    <div style="font-family:Arial,sans-serif;line-height:1.6">
-      <h2>Welcome to Balans</h2>
-      <p>Finish setting up your account by creating a password.</p>
-      <p>
-        <a href="${link}" style="display:inline-block;background:#8A7CFF;color:#000;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:600">Create password</a>
-      </p>
-      <p>If the button doesn’t work, copy this link into your browser:<br />
-      <span style="word-break:break-all;color:#555">${link}</span></p>
+    <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:600px;margin:0 auto;padding:20px">
+      <div style="text-align:center;margin-bottom:30px">
+        <h1 style="color:#333;margin-bottom:10px">Welcome to Balans!</h1>
+        <p style="color:#666;font-size:16px">Your order has been confirmed</p>
+      </div>
+      
+      <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
+        <h2 style="color:#333;margin-top:0">Finish setting up your account to see results</h2>
+        <p style="color:#666;margin-bottom:20px">
+          Complete your account setup to access your personalized hormone test results and insights.
+        </p>
+        <div style="text-align:center">
+          <a href="${link}" style="display:inline-block;background:#8A7CFF;color:#000;text-decoration:none;padding:15px 30px;border-radius:10px;font-weight:600;font-size:16px">
+            Complete Account Setup
+          </a>
+        </div>
+      </div>
+      
+      <div style="text-align:center;color:#999;font-size:14px">
+        <p>If the button doesn't work, copy this link into your browser:</p>
+        <p style="word-break:break-all;background:#f0f0f0;padding:10px;border-radius:5px;margin:10px 0">
+          ${link}
+        </p>
+      </div>
     </div>
   `
   return await resend.emails.send({
     from: 'Balans <info@balansisland.is>',
     to,
-    subject: 'Create your Balans password',
+    subject: 'Complete your Balans account setup to see results',
     html
   })
 }

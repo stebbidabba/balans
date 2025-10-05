@@ -1,7 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
-import { sendPasswordSetupEmail, sendAccessLinkEmail } from "@/lib/email";
+import { sendAccountSetupEmail } from "@/lib/email";
 
 export async function createPaymentAction(args: { userId?: string; email?: string; products?: any[]; productId?: string; quantity?: number; isFromCart?: boolean }) {
   const { userId, email, products, productId, quantity = 1, isFromCart = false } = args;
@@ -263,39 +263,17 @@ export async function sendPostPaymentEmails(email: string) {
     }
 
     const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
-    const supabase = supabaseAdmin()
     
-    console.log(`Sending post-payment emails to: ${email}`);
+    console.log(`Sending account setup email to: ${email}`);
     
-    // Generate both recovery (set password) and magiclink (one-click sign in)
-    const { data: recData, error: recErr } = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-      options: { redirectTo: `${site}/auth/callback?next=/account` }
-    } as any)
+    // Create a direct link to signup page with email pre-filled
+    const signupLink = `${site}/signup?email=${encodeURIComponent(email)}`
     
-    if (!recErr && (recData as any)?.properties?.action_link) {
-      console.log('Sending password setup email...');
-      await sendPasswordSetupEmail(email, (recData as any).properties.action_link)
-    } else {
-      console.log('Failed to generate recovery link:', recErr);
-    }
+    console.log('Sending account setup email...');
+    await sendAccountSetupEmail(email, signupLink)
     
-    const { data: magicData, error: magicErr } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: { redirectTo: `${site}/auth/callback?next=/account` }
-    } as any)
-    
-    if (!magicErr && (magicData as any)?.properties?.action_link) {
-      console.log('Sending magic link email...');
-      await sendAccessLinkEmail(email, (magicData as any).properties.action_link)
-    } else {
-      console.log('Failed to generate magic link:', magicErr);
-    }
-    
-    console.log('Post-payment emails sent successfully');
+    console.log('Account setup email sent successfully');
   } catch (e) {
-    console.error('Failed to send post-payment emails:', e);
+    console.error('Failed to send account setup email:', e);
   }
 }
