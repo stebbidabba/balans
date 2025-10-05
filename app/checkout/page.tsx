@@ -394,7 +394,7 @@ export default function CheckoutPage() {
               {products.map((product) => (
                 <div key={product.id} className="flex justify-between items-center py-2">
                   <div>
-                    <h3 className="font-medium text-gray-900">{product.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                    <h3 className="font-medium text-gray-900">{product.name.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</h3>
                     <p className="text-sm text-gray-600">Qty: {product.quantity}</p>
                   </div>
                   <span className="font-medium text-gray-900">{product.price_isk * product.quantity} ISK</span>
