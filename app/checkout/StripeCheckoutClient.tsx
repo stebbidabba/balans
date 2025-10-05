@@ -33,7 +33,14 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       // Send emails after successful payment
       if (email) {
         console.log('Sending post-payment emails...');
-        await sendPostPaymentEmails(email);
+        try {
+          await sendPostPaymentEmails(email);
+          console.log('Post-payment emails sent successfully');
+        } catch (error) {
+          console.error('Failed to send post-payment emails:', error);
+        }
+      } else {
+        console.log('No email provided for post-payment emails');
       }
       return;
     }
@@ -51,6 +58,19 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       setMsg(error.message || "Payment error");
     } else {
       setPaymentSuccess(true);
+      
+      // Send emails after successful payment
+      if (email) {
+        console.log('Sending post-payment emails...');
+        try {
+          await sendPostPaymentEmails(email);
+          console.log('Post-payment emails sent successfully');
+        } catch (error) {
+          console.error('Failed to send post-payment emails:', error);
+        }
+      } else {
+        console.log('No email provided for post-payment emails');
+      }
     }
   }
 
