@@ -60,7 +60,7 @@ export default function CheckoutPage() {
             }
 
             // Load products based on source
-            let finalProducts = [];
+            let finalProducts: any[] = [];
             
             if (isFromCart) {
               // Load all cart items
@@ -113,7 +113,7 @@ export default function CheckoutPage() {
                 }
               }
               
-              const product = fallbackProducts[productId]
+              const product = fallbackProducts[String(productId)]
               if (product) {
                 finalProducts = [{ ...product, quantity }]
               }
