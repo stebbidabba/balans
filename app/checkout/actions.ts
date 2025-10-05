@@ -76,7 +76,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
         
         // Create order_items for each product
         if (products && products.length > 0) {
-          const orderItems = []
+          const orderItems: any[] = []
           
           // Get product UUIDs from the products table
           const { data: productData, error: productError } = await supabase
@@ -90,15 +90,15 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
             console.log('Failed to fetch products:', productError.message)
           } else {
             // Create mapping from SKU -> UUID
-            const productMap = {}
-            productData.forEach(product => {
+            const productMap: Record<string, string> = {}
+            productData.forEach((product: any) => {
               productMap[product.sku] = product.id
             })
             
             console.log('Product map:', productMap)
             
             let seq = 1
-            products.forEach(product => {
+            products.forEach((product: any) => {
               console.log('Processing product:', product)
               // Create one order_item record for each individual kit
               for (let i = 0; i < product.quantity; i++) {
@@ -153,7 +153,7 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
           if (productError) {
             console.log('Failed to fetch product:', productError.message)
           } else {
-          const orderItems = []
+          const orderItems: any[] = []
           let seq = 1
             for (let i = 0; i < quantity; i++) {
             const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
