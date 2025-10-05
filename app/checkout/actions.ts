@@ -3,28 +3,53 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendAccountSetupEmail } from "@/lib/email";
 
-export async function createPaymentAction(args: { userId?: string; email?: string; products?: any[]; productId?: string; quantity?: number; isFromCart?: boolean }) {
-  const { userId, email, products, productId, quantity = 1, isFromCart = false } = args;
+export async function createPaymentAction(args: { 
+  userId?: string; 
+  email?: string; 
+  fullName?: string;
+  phone?: string;
+  password?: string;
+  products?: any[]; 
+  productId?: string; 
+  quantity?: number; 
+  isFromCart?: boolean 
+}) {
+  const { userId, email, fullName, phone, password, products, productId, quantity = 1, isFromCart = false } = args;
   
   try {
     const supabase = supabaseAdmin();
-    // Ensure we have a user to associate with the order. If not logged in, create a guest user.
+    // Ensure we have a user to associate with the order. If not logged in, create a complete account.
     let effectiveUserId = userId;
     try {
-      if (!effectiveUserId && email) {
+      if (!effectiveUserId && email && fullName && phone && password) {
         const { data: created, error: createErr } = await supabase.auth.admin.createUser({
           email: email,
-          email_confirm: true
+          password: password,
+          email_confirm: true,
+          user_metadata: {
+            full_name: fullName,
+            phone: phone
+          }
         });
         if (!createErr && created?.user?.id) {
           effectiveUserId = created.user.id;
-          console.log('Created guest user for order:', effectiveUserId);
+          console.log('Created complete user account for order:', effectiveUserId);
+          
+          // Create profile record
+          await supabase
+            .from('profiles')
+            .upsert({
+              user_id: effectiveUserId,
+              full_name: fullName,
+              phone: phone,
+              created_at: new Date().toISOString()
+            });
         } else if (createErr) {
-          console.log('Could not create guest user, will fallback to local file:', createErr.message);
+          console.log('Could not create user account, will fallback to local file:', createErr.message);
         }
       }
     } catch (e) {
-      console.log('Guest user creation exception:', e);
+      console.log('User account creation exception:', e);
     }
     
     // Calculate total amount
@@ -264,16 +289,16 @@ export async function sendPostPaymentEmails(email: string) {
 
     const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
     
-    console.log(`Sending account setup email to: ${email}`);
+    console.log(`Sending account ready email to: ${email}`);
     
-    // Create a direct link to signup page with email pre-filled
-    const signupLink = `${site}/signup?email=${encodeURIComponent(email)}`
+    // Create a direct link to account page since account is already complete
+    const accountLink = `${site}/account`
     
-    console.log('Sending account setup email...');
-    await sendAccountSetupEmail(email, signupLink)
+    console.log('Sending account ready email...');
+    await sendAccountSetupEmail(email, accountLink)
     
-    console.log('Account setup email sent successfully');
+    console.log('Account ready email sent successfully');
   } catch (e) {
-    console.error('Failed to send account setup email:', e);
+    console.error('Failed to send account ready email:', e);
   }
 }

@@ -24,17 +24,17 @@ export async function sendAccountSetupEmail(to: string, link: string) {
     <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:600px;margin:0 auto;padding:20px">
       <div style="text-align:center;margin-bottom:30px">
         <h1 style="color:#333;margin-bottom:10px">Welcome to Balans!</h1>
-        <p style="color:#666;font-size:16px">Your order has been confirmed</p>
+        <p style="color:#666;font-size:16px">Your order has been confirmed and your account is ready</p>
       </div>
       
       <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
-        <h2 style="color:#333;margin-top:0">Finish setting up your account to see results</h2>
+        <h2 style="color:#333;margin-top:0">Your account is ready!</h2>
         <p style="color:#666;margin-bottom:20px">
-          Complete your account setup to access your personalized hormone test results and insights.
+          You can now access your account to view your order status and test results.
         </p>
         <div style="text-align:center">
           <a href="${link}" style="display:inline-block;background:#8A7CFF;color:#000;text-decoration:none;padding:15px 30px;border-radius:10px;font-weight:600;font-size:16px">
-            Complete Account Setup
+            Access Your Account
           </a>
         </div>
       </div>
@@ -50,7 +50,7 @@ export async function sendAccountSetupEmail(to: string, link: string) {
   return await resend.emails.send({
     from: 'Balans <info@balansisland.is>',
     to,
-    subject: 'Complete your Balans account setup to see results',
+    subject: 'Your Balans account is ready - Access your results',
     html
   })
 }
