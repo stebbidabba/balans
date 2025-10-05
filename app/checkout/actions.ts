@@ -1,7 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
-import { sendPasswordSetupEmail } from "@/lib/email";
+import { sendPasswordSetupEmail, sendAccessLinkEmail } from "@/lib/email";
 
 export async function createPaymentAction(args: { userId?: string; email?: string; products?: any[]; productId?: string; quantity?: number; isFromCart?: boolean }) {
   const { userId, email, products, productId, quantity = 1, isFromCart = false } = args;
@@ -240,22 +240,31 @@ export async function createPaymentAction(args: { userId?: string; email?: strin
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     console.log(`Order created: ${orderId} for ${email}`);
-    // Send password setup email for guest users
+    // Send access + password setup emails to the buyer (guest or logged-in)
     try {
-      if (!userId && email) {
+      if (email) {
         const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://balansisland.is'
         const supabase = supabaseAdmin()
-        const { data, error } = await supabase.auth.admin.generateLink({
+        // Generate both recovery (set password) and magiclink (one-click sign in)
+        const { data: recData, error: recErr } = await supabase.auth.admin.generateLink({
           type: 'recovery',
           email,
           options: { redirectTo: `${site}/auth/callback?next=/account` }
         } as any)
-        if (!error && (data as any)?.properties?.action_link) {
-          await sendPasswordSetupEmail(email, (data as any).properties.action_link)
+        if (!recErr && (recData as any)?.properties?.action_link) {
+          await sendPasswordSetupEmail(email, (recData as any).properties.action_link)
+        }
+        const { data: magicData, error: magicErr } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email,
+          options: { redirectTo: `${site}/auth/callback?next=/account` }
+        } as any)
+        if (!magicErr && (magicData as any)?.properties?.action_link) {
+          await sendAccessLinkEmail(email, (magicData as any).properties.action_link)
         }
       }
     } catch (e) {
-      console.log('Non-blocking: failed to trigger password setup email', e)
+      console.log('Non-blocking: failed to trigger access/password emails', e)
     }
     
     return {
