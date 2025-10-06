@@ -148,6 +148,22 @@ export default async function AccountResultsPage() {
     }
   }
 
+  // Visual status and bar helpers
+  const evaluateStatus = (value: number, low: number | null, high: number | null) => {
+    if (low == null || high == null) return { label: null as string | null, status: null as string | null }
+    if (value < low) return { label: 'Low', status: 'low' }
+    if (value > high) return { label: 'High', status: 'high' }
+    return { label: 'Normal', status: 'normal' }
+  }
+
+  const computePercent = (value: number, low: number | null, high: number | null) => {
+    if (low == null || high == null) return 50
+    const span = high - low
+    if (span <= 0) return 50
+    const pct = ((value - low) / span) * 100
+    return Math.max(0, Math.min(100, pct))
+  }
+
   // If order mapping fails, show a flat list grouped by sample_id instead
   const groupedResults = (() => {
     const grouped: { [key: string]: { title: string; results: TestResult[] } } = {}
@@ -197,26 +213,45 @@ export default async function AccountResultsPage() {
                   <p className="text-text-muted">Tested on {new Date(group.results[0]?.tested_at || new Date()).toLocaleDateString()}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {group.results.map((result: TestResult, idx: number) => (
-                    <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/5 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-medium text-white">{getHormoneDisplayName(result.hormone_type)}</h3>
-                        {isRangeStatus(result.status) && (
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status!.toLowerCase())}`}>
-                            {getStatusIcon(result.status!.toLowerCase())} {result.status!.toUpperCase()}
-                          </span>
-                        )}
+                  {group.results.map((result: TestResult, idx: number) => {
+                    const v = result.result_value != null ? Number(result.result_value) : NaN
+                    const low = result.reference_range_min != null ? Number(result.reference_range_min) : null
+                    const high = result.reference_range_max != null ? Number(result.reference_range_max) : null
+                    const { label, status } = !isNaN(v) ? evaluateStatus(v, low, high) : { label: null, status: null }
+                    const pct = !isNaN(v) ? computePercent(v, low, high) : 50
+                    return (
+                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/90 text-gray-900 rounded-2xl p-5 shadow-sm">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-lg font-semibold">{getHormoneDisplayName(result.hormone_type)}</h3>
+                            {label && (
+                              <div className={`mt-1 text-sm ${status === 'low' ? 'text-red-500' : status === 'high' ? 'text-red-500' : 'text-green-600'}`}>{label}</div>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-3xl font-semibold">{isNaN(v) ? '-' : v}</div>
+                            <div className="text-sm text-gray-500">{result.unit ?? ''}</div>
+                          </div>
+                        </div>
+
+                        {/* Range bar */}
+                        <div className="mt-4">
+                          <div className="relative h-3 rounded-full overflow-hidden" style={{background: 'linear-gradient(90deg, rgba(244,63,94,0.35) 0% 20%, rgba(34,197,94,0.35) 20% 80%, rgba(244,63,94,0.35) 80% 100%)'}}>
+                            <div className="absolute left-0 top-0 h-full bg-red-400/30" style={{width: '20%'}}></div>
+                            <div className="absolute left-[20%] top-0 h-full bg-green-400/30" style={{width: '60%'}}></div>
+                            <div className="absolute right-0 top-0 h-full bg-red-400/30" style={{width: '20%'}}></div>
+                          </div>
+                          <div className="relative mt-[-14px]">
+                            <div className="absolute -translate-x-1/2" style={{left: `${pct}%`}}>
+                              <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-300 shadow"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 text-sm text-gray-500">Range: {result.reference_range_min ?? '-'} – {result.reference_range_max ?? '-'} {result.unit ?? ''}</div>
                       </div>
-                      <div className="mb-3">
-                        <div className="text-2xl font-bold text-brand">{result.result_value ?? '-'} {result.unit ?? ''}</div>
-                      </div>
-                      <div className="mb-3 text-sm text-text-muted">Reference Range: {result.reference_range_min ?? '-'} - {result.reference_range_max ?? '-'} {result.unit ?? ''}</div>
-                      <div className="mb-3 text-sm text-text-muted">{getHormoneDescription(result.hormone_type)}</div>
-                      {result.notes ? (
-                        <div className="pt-3 border-t border-white/10 text-sm text-text-muted"><strong>Lab Notes:</strong> {result.notes}</div>
-                      ) : null}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 {group.results[0]?.kit_code && (
                   <div className="mt-6 pt-6 border-top border-white/10 text-sm text-text-muted">Kit Code: <span className="font-mono text-white">{group.results[0].kit_code}</span></div>
