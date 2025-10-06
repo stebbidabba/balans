@@ -194,7 +194,7 @@ export default async function AccountResultsPage() {
   console.log('[ResultsPage] sample order.id:', (orders && orders[0]?.id) || null)
   console.log('[ResultsPage] sample flattened.order_id:', (flattened && flattened[0]?.order_id) || null)
   console.log('[ResultsPage] groupedResults count:', groupedResults.length)
-  console.log('[ResultsPage] grouped order ids:', groupedResults.map(g => g.order.id))
+  console.log('[ResultsPage] grouped keys:', groupedResults.map((g: any) => g.id))
 
   return (
     <section>
