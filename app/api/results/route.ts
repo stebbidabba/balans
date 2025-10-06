@@ -44,10 +44,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch results via proper joins:
-    // 1) samples (owned by user)
+    // 1) samples (owned by user) joined to kits to get kit_code
     const { data: samples, error: samplesErr } = await supabase
       .from('samples')
-      .select('id, kit_code, user_id')
+      .select('id, user_id, received_at_lab, kit_id, kits ( id, kit_code )')
       .eq('user_id', user.id)
 
     if (samplesErr) {
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const sampleIds = (samples || []).map((s: any) => s.id)
-    const kitCodes = (samples || []).map((s: any) => s.kit_code).filter(Boolean)
+    const kitCodes = (samples || []).map((s: any) => s.kits?.kit_code).filter(Boolean)
 
     if (sampleIds.length === 0) {
       return NextResponse.json({ results: [], orders: orders || [] })
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
     const flattened = (resultValues || []).map((rv: any) => {
       const result = resultById[rv.result_id]
       const sample = result ? sampleById[result.sample_id] : null
-      const kitCode = sample?.kit_code || null
+      const kitCode = sample?.kits?.kit_code || null
       const orderId = kitCode ? kitCodeToOrderId[kitCode] || null : null
       const assay = assaysMap[rv.assay_id]
       return {
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
         unit: rv.unit ?? null,
         reference_range_min: rv.reference_range_min ?? null,
         reference_range_max: rv.reference_range_max ?? null,
-        tested_at: rv.tested_at || null,
+        tested_at: rv.tested_at || sample?.received_at_lab || null,
         kit_code: kitCode,
         notes: result?.notes || null,
         status: result?.status || null
