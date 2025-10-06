@@ -1,6 +1,7 @@
 
 import Link from 'next/link'
 import { supabaseServer } from '@/lib/supabase'
+import ResultsClientFallback from './ResultsClient'
 
 interface TestResult {
   id?: number | string
@@ -207,8 +208,11 @@ export default async function AccountResultsPage() {
         {groupedResults.length === 0 ? (
           <div className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-12 text-center border border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4">No results yet</h3>
-            <p className="text-text-muted mb-6">Your test results will appear here once analysis is complete</p>
-            <Link href="/account/orders" className="inline-block px-8 py-3 bg-brand text-black font-semibold rounded-xl hover:opacity-90 transition-opacity">View My Orders</Link>
+            <p className="text-text-muted mb-6">Attempting client refresh below…</p>
+            <div className="text-left"><ResultsClientFallback /></div>
+            <div className="mt-6">
+              <Link href="/account/orders" className="inline-block px-8 py-3 bg-brand text-black font-semibold rounded-xl hover:opacity-90 transition-opacity">View My Orders</Link>
+            </div>
           </div>
         ) : (
           <div className="space-y-8">
