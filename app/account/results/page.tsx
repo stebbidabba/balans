@@ -1,9 +1,6 @@
 
-'use client'
-
-import { useState, useEffect, useRef } from 'react'
-import { createClient } from '@/lib/supabase-client'
 import Link from 'next/link'
+import { supabaseServer } from '@/lib/supabase'
 
 interface TestResult {
   id?: number | string
@@ -28,39 +25,107 @@ interface Order {
   products?: any[]
 }
 
-export default function AccountResultsPage() {
-  const [results, setResults] = useState<TestResult[]>([])
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default async function AccountResultsPage() {
+  const supabase = supabaseServer()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return (
+      <div className="text-center">
+        <div className="text-red-400 text-xl mb-4">Please log in to view your results</div>
+        <Link href="/login" className="text-brand hover:opacity-80">Go to Login</Link>
+      </div>
+    )
+  }
 
-  const hasFetchedRef = useRef(false)
-  useEffect(() => {
-    if (hasFetchedRef.current) return
-    hasFetchedRef.current = true
-    fetchResults()
-    // empty deps: run once; ref guards StrictMode double-invoke
-  }, [])
+  // Orders for header/context
+  const { data: ordersRaw } = await supabase
+    .from('orders')
+    .select(`*, order_items(id, quantity, unit_price, products(name, description))`)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
 
-  const fetchResults = async () => {
-    try {
-      const supabase = createClient()
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      if (!currentUser) {
-        setError('Please log in to view your results')
-        setLoading(false)
-        return
+  const orders: Order[] = (ordersRaw || []) as any
+
+  // Samples joined to kits for kit_code
+  const { data: samplesRaw } = await supabase
+    .from('samples')
+    .select('id, user_id, received_at_lab, kit_id, kits ( id, kit_code )')
+    .eq('user_id', user.id)
+
+  const samples = samplesRaw || []
+  const sampleIds = samples.map((s: any) => s.id)
+  const kitCodes: string[] = samples.map((s: any) => s.kits?.kit_code).filter(Boolean)
+
+  let flattened: TestResult[] = []
+  if (sampleIds.length > 0) {
+    const allowedStatuses = ['ready', 'released', 'corrected']
+    const { data: resultsRows } = await supabase
+      .from('results')
+      .select('id, sample_id, status, notes')
+      .in('sample_id', sampleIds)
+      .in('status', allowedStatuses)
+
+    const resultIds = (resultsRows || []).map((r: any) => r.id)
+    const sampleById = (samples || []).reduce((acc: any, s: any) => { acc[s.id] = s; return acc }, {})
+    const resultById = (resultsRows || []).reduce((acc: any, r: any) => { acc[r.id] = r; return acc }, {})
+
+    if (resultIds.length > 0) {
+      const { data: resultValues } = await supabase
+        .from('result_values')
+        .select('id, result_id, assay_id, value, unit, reference_range_min, reference_range_max, tested_at')
+        .in('result_id', resultIds)
+
+      const assayIds = Array.from(new Set((resultValues || []).map((rv: any) => rv.assay_id).filter(Boolean)))
+      let assaysMap: Record<string, any> = {}
+      if (assayIds.length > 0) {
+        const { data: assays } = await supabase
+          .from('assays')
+          .select('id, display_name, ref_low, ref_high')
+          .in('id', assayIds)
+        assaysMap = (assays || []).reduce((acc: any, a: any) => { acc[a.id] = a; return acc }, {})
       }
 
-      const response = await fetch('/api/results')
-      if (!response.ok) throw new Error('Failed to fetch results')
-      const data = await response.json()
-      setResults(data.results || [])
-      setOrders(data.orders || [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch results')
-    } finally {
-      setLoading(false)
+      // Map kit_code -> order_id via kits -> shipments
+      let kitCodeToOrderId: Record<string, string> = {}
+      if (kitCodes.length > 0) {
+        const { data: kits } = await supabase
+          .from('kits')
+          .select('id, kit_code')
+          .in('kit_code', kitCodes)
+        const kitIds = (kits || []).map((k: any) => k.id)
+        const kitCodeById = (kits || []).reduce((acc: any, k: any) => { acc[k.id] = k.kit_code; return acc }, {})
+        if (kitIds.length > 0) {
+          const { data: shipments } = await supabase
+            .from('shipments')
+            .select('id, kit_id, order_id')
+            .in('kit_id', kitIds)
+          kitCodeToOrderId = (shipments || []).reduce((acc: any, s: any) => {
+            const code = kitCodeById[s.kit_id]
+            if (code) acc[code] = s.order_id
+            return acc
+          }, {})
+        }
+      }
+
+      flattened = (resultValues || []).map((rv: any) => {
+        const result = resultById[rv.result_id]
+        const sample = result ? sampleById[result.sample_id] : null
+        const kitCode = sample?.kits?.kit_code || null
+        const orderId = kitCode ? kitCodeToOrderId[kitCode] || null : null
+        const assay = assaysMap[rv.assay_id]
+        return {
+          order_id: orderId,
+          hormone_type: assay?.display_name || 'unknown',
+          result_value: rv.value ?? null,
+          unit: rv.unit ?? null,
+          reference_range_min: rv.reference_range_min ?? assay?.ref_low ?? null,
+          reference_range_max: rv.reference_range_max ?? assay?.ref_high ?? null,
+          tested_at: rv.tested_at || sample?.received_at_lab || null,
+          kit_code: kitCode,
+          notes: result?.notes || null,
+          status: result?.status || null
+        }
+      }).filter((r: any) => r.order_id)
     }
   }
 
@@ -102,7 +167,7 @@ export default function AccountResultsPage() {
 
   const groupResultsByOrder = () => {
     const grouped: { [key: string]: { order: Order; results: TestResult[] } } = {}
-    results.forEach(result => {
+    flattened.forEach(result => {
       if (!result.order_id) return
       const key = String(result.order_id)
       if (!grouped[key]) {
@@ -112,19 +177,6 @@ export default function AccountResultsPage() {
       if (grouped[key]) grouped[key].results.push(result)
     })
     return Object.values(grouped)
-  }
-
-  if (loading) {
-    return <div className="text-white">Loading your results...</div>
-  }
-
-  if (error) {
-    return (
-      <div className="text-center">
-        <div className="text-red-400 text-xl mb-4">{error}</div>
-        <Link href="/login" className="text-brand hover:opacity-80">Go to Login</Link>
-      </div>
-    )
   }
 
   const groupedResults = groupResultsByOrder()
