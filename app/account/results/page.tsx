@@ -1,6 +1,7 @@
+
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import Link from 'next/link'
 
@@ -33,8 +34,12 @@ export default function AccountResultsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const hasFetchedRef = useRef(false)
   useEffect(() => {
+    if (hasFetchedRef.current) return
+    hasFetchedRef.current = true
     fetchResults()
+    // empty deps: run once; ref guards StrictMode double-invoke
   }, [])
 
   const fetchResults = async () => {
