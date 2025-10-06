@@ -220,31 +220,25 @@ export default async function AccountResultsPage() {
                     const { label, status } = !isNaN(v) ? evaluateStatus(v, low, high) : { label: null, status: null }
                     const pct = !isNaN(v) ? computePercent(v, low, high) : 50
                     return (
-                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/90 text-gray-900 rounded-2xl p-5 shadow-sm">
-                        <div className="flex items-start justify-between">
+                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/90 text-gray-900 rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h3 className="text-lg font-semibold">{getHormoneDisplayName(result.hormone_type)}</h3>
+                            <h3 className="text-xl font-semibold leading-tight">{getHormoneDisplayName(result.hormone_type)}</h3>
                             {label && (
-                              <div className={`mt-1 text-sm ${status === 'low' ? 'text-red-500' : status === 'high' ? 'text-red-500' : 'text-green-600'}`}>{label}</div>
+                              <div className={`mt-1 text-base ${status === 'low' ? 'text-red-500' : status === 'high' ? 'text-red-500' : 'text-green-600'}`}>{label}</div>
                             )}
                           </div>
-                          <div className="text-right">
-                            <div className="text-3xl font-semibold">{isNaN(v) ? '-' : v}</div>
-                            <div className="text-sm text-gray-500">{result.unit ?? ''}</div>
+                          <div className="flex items-baseline gap-2">
+                            <div className="text-4xl font-bold leading-none">{isNaN(v) ? '-' : v}</div>
+                            <div className="text-base text-gray-500">{result.unit ?? ''}</div>
                           </div>
                         </div>
 
                         {/* Range bar */}
-                        <div className="mt-4">
-                          <div className="relative h-3 rounded-full overflow-hidden" style={{background: 'linear-gradient(90deg, rgba(244,63,94,0.35) 0% 20%, rgba(34,197,94,0.35) 20% 80%, rgba(244,63,94,0.35) 80% 100%)'}}>
-                            <div className="absolute left-0 top-0 h-full bg-red-400/30" style={{width: '20%'}}></div>
-                            <div className="absolute left-[20%] top-0 h-full bg-green-400/30" style={{width: '60%'}}></div>
-                            <div className="absolute right-0 top-0 h-full bg-red-400/30" style={{width: '20%'}}></div>
-                          </div>
-                          <div className="relative mt-[-14px]">
-                            <div className="absolute -translate-x-1/2" style={{left: `${pct}%`}}>
-                              <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-300 shadow"></div>
-                            </div>
+                        <div className="mt-4 relative">
+                          <div className="h-3 rounded-full overflow-hidden" style={{background: 'linear-gradient(90deg, rgba(244,63,94,0.35) 0% 20%, rgba(34,197,94,0.35) 20% 80%, rgba(244,63,94,0.35) 80% 100%)'}}></div>
+                          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2" style={{left: `${pct}%`}}>
+                            <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-300 shadow" />
                           </div>
                         </div>
 
