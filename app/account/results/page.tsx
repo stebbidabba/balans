@@ -180,6 +180,9 @@ export default async function AccountResultsPage() {
   }
 
   const groupedResults = groupResultsByOrder()
+  console.log('[ResultsPage] orders:', (orders || []).map(o => o.id))
+  console.log('[ResultsPage] flattened count:', flattened.length, 'sample rows example:', flattened.slice(0, 3))
+  console.log('[ResultsPage] groupedResults count:', groupedResults.length, 'keys:', groupedResults.map(g => g.order.id))
 
   return (
     <section>
