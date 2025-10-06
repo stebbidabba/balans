@@ -43,21 +43,48 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [], orders: [] })
     }
 
-    // Fetch results via proper joins:
-    // 1) samples (owned by user) joined to kits to get kit_code
+    // Fetch results via proper joins anchored on user's orders:
+    // orders (user_id) -> shipments (order_id) -> kits (kit_id) -> samples (kit_id)
+    const orderIds = (orders || []).map((o: any) => o.id)
+    if (orderIds.length === 0) {
+      return NextResponse.json({ results: [], orders: orders || [] })
+    }
+
+    const { data: shipments, error: shipmentsErr } = await supabase
+      .from('shipments')
+      .select('id, order_id, kit_id')
+      .in('order_id', orderIds)
+    if (shipmentsErr) {
+      console.error('Error fetching shipments:', shipmentsErr)
+      return NextResponse.json({ results: [], orders: orders || [] })
+    }
+
+    const kitIds = (shipments || []).map((s: any) => s.kit_id).filter(Boolean)
+    if (kitIds.length === 0) {
+      return NextResponse.json({ results: [], orders: orders || [] })
+    }
+
+    const { data: kits, error: kitsErr } = await supabase
+      .from('kits')
+      .select('id, kit_code')
+      .in('id', kitIds)
+    if (kitsErr) {
+      console.error('Error fetching kits:', kitsErr)
+      return NextResponse.json({ results: [], orders: orders || [] })
+    }
+
+    const kitIdToCode: Record<string, string> = (kits || []).reduce((acc: any, k: any) => { acc[k.id] = k.kit_code; return acc }, {})
+
     const { data: samples, error: samplesErr } = await supabase
       .from('samples')
-      .select('id, user_id, received_at_lab, kit_id, kits ( id, kit_code )')
-      .eq('user_id', user.id)
-
+      .select('id, received_at_lab, kit_id')
+      .in('kit_id', kitIds)
     if (samplesErr) {
       console.error('Error fetching samples:', samplesErr)
       return NextResponse.json({ results: [], orders: orders || [] })
     }
 
     const sampleIds = (samples || []).map((s: any) => s.id)
-    const kitCodes = (samples || []).map((s: any) => s.kits?.kit_code).filter(Boolean)
-
     if (sampleIds.length === 0) {
       return NextResponse.json({ results: [], orders: orders || [] })
     }
@@ -108,36 +135,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 5) Map kit_code -> order_id via kits -> shipments
-    let kitCodeToOrderId: Record<string, string> = {}
-    if (kitCodes.length > 0) {
-      const { data: kits, error: kitsErr } = await supabase
-        .from('kits')
-        .select('id, kit_code')
-        .in('kit_code', kitCodes)
-
-      if (!kitsErr) {
-        const kitIds = (kits || []).map((k: any) => k.id)
-        const kitCodeById = (kits || []).reduce((acc: any, k: any) => { acc[k.id] = k.kit_code; return acc }, {})
-        if (kitIds.length > 0) {
-          const { data: shipments, error: shErr } = await supabase
-            .from('shipments')
-            .select('id, kit_id, order_id')
-            .in('kit_id', kitIds)
-          if (!shErr) {
-            kitCodeToOrderId = (shipments || []).reduce((acc: any, s: any) => {
-              const code = kitCodeById[s.kit_id]
-              if (code) acc[code] = s.order_id
-              return acc
-            }, {})
-          } else {
-            console.error('Error fetching shipments:', shErr)
-          }
-        }
-      } else {
-        console.error('Error fetching kits:', kitsErr)
-      }
-    }
+    // 5) Map kit_code -> order_id via shipments already loaded
+    const kitCodeToOrderId: Record<string, string> = (shipments || []).reduce((acc: any, s: any) => {
+      const code = kitIdToCode[s.kit_id]
+      if (code) acc[code] = s.order_id
+      return acc
+    }, {})
 
     // Indexes for assembly
     const sampleById = (samples || []).reduce((acc: any, s: any) => { acc[s.id] = s; return acc }, {})
@@ -147,7 +150,7 @@ export async function GET(request: NextRequest) {
     const flattened = (resultValues || []).map((rv: any) => {
       const result = resultById[rv.result_id]
       const sample = result ? sampleById[result.sample_id] : null
-      const kitCode = sample?.kits?.kit_code || null
+      const kitCode = sample ? kitIdToCode[sample.kit_id] || null : null
       const orderId = kitCode ? kitCodeToOrderId[kitCode] || null : null
       const assay = assaysMap[rv.assay_id]
       return {
