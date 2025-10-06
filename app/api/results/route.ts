@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     const allowedStatuses = ['ready', 'released', 'corrected']
     const { data: resultsRows, error: resultsErr } = await supabase
       .from('results')
-      .select('id, sample_id, status, notes')
+      .select('id, sample_id, status')
       .in('sample_id', sampleIds)
       .in('status', allowedStatuses)
 
@@ -159,10 +159,10 @@ export async function GET(request: NextRequest) {
         reference_range_max: rv.reference_range_max ?? assay?.ref_high ?? null,
         tested_at: rv.tested_at || sample?.received_at_lab || null,
         kit_code: kitCode,
-        notes: result?.notes || null,
+        notes: null,
         status: result?.status || null
       }
-    }).filter((r: any) => r.order_id) // keep only rows that map to an order
+    })
 
     // Transform orders data
     const transformedOrders = orders.map((order: any) => ({
