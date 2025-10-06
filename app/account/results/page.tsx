@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabase'
 interface TestResult {
   id?: number | string
   order_id: string | null
+  sample_id?: string | null
   kit_code?: string | null
   hormone_type: string
   result_value: number | null
@@ -117,6 +118,7 @@ export default async function AccountResultsPage() {
         const assay = assaysMap[rv.assay_id]
         return {
           order_id: orderId,
+          sample_id: result?.sample_id ?? null,
           hormone_type: assay?.display_name || 'unknown',
           result_value: rv.value ?? null,
           unit: rv.unit ?? null,
@@ -173,36 +175,20 @@ export default async function AccountResultsPage() {
     }
   }
 
-  const groupResultsByOrder = () => {
-    const grouped: { [key: string]: { order: Order; results: TestResult[] } } = {}
-    flattened.forEach(result => {
-      if (!result.order_id) return
-      const key = String(result.order_id)
+  // If order mapping fails, show a flat list grouped by sample_id instead
+  const groupedResults = (() => {
+    const grouped: { [key: string]: { title: string; results: TestResult[] } } = {}
+    flattened.forEach(r => {
+      const key = r.order_id ?? r.sample_id ?? 'unknown'
       if (!grouped[key]) {
-        const order = orders.find(o => o.id === result.order_id)
-        if (order) {
-          grouped[key] = { order, results: [] }
-        } else {
-          // Fallback placeholder order so results still display even if orders list doesn't include this id
-          grouped[key] = {
-            order: {
-              id: key,
-              email: '',
-              status: 'completed',
-              total_amount: 0,
-              created_at: result.tested_at || new Date().toISOString(),
-              products: []
-            },
-            results: []
-          }
-        }
+        const order = r.order_id ? orders.find(o => o.id === r.order_id) : null
+        const title = order ? `Order #${order.id}` : r.sample_id ? `Sample ${r.sample_id}` : 'Results'
+        grouped[key] = { title, results: [] }
       }
-      if (grouped[key]) grouped[key].results.push(result)
+      grouped[key].results.push(r)
     })
-    return Object.values(grouped)
-  }
-
-  const groupedResults = groupResultsByOrder()
+    return Object.entries(grouped).map(([k, v]) => ({ id: k, title: v.title, results: v.results }))
+  })()
   console.log('[ResultsPage] orders count:', (orders || []).length)
   console.log('[ResultsPage] orders ids:', (orders || []).map(o => o.id))
   console.log('[ResultsPage] flattened count:', flattened.length)
@@ -228,14 +214,14 @@ export default async function AccountResultsPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {groupedResults.map(({ order, results }) => (
-              <div key={order.id} className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+            {groupedResults.map((group: any) => (
+              <div key={group.id} className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-white mb-2">Order #{order.id}</h2>
-                  <p className="text-text-muted">Tested on {new Date(results[0]?.tested_at || order.created_at).toLocaleDateString()}</p>
+                  <h2 className="text-xl font-semibold text-white mb-2">{group.title}</h2>
+                  <p className="text-text-muted">Tested on {new Date(group.results[0]?.tested_at || new Date()).toLocaleDateString()}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {results.map((result, idx) => (
+                  {group.results.map((result: TestResult, idx: number) => (
                     <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/5 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-lg font-medium text-white">{getHormoneDisplayName(result.hormone_type)}</h3>
