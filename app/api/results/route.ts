@@ -43,30 +43,70 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [], orders: [] })
     }
 
-    // Fetch test results for user's orders
-    const orderIds = orders.map(order => order.id)
-    
+    // Fetch results using new schema: samples -> results -> result_values
+    const orderIds = orders.map((order: any) => order.id)
     if (orderIds.length === 0) {
       return NextResponse.json({ results: [], orders: [] })
     }
 
-    let results = []
+    let results: any[] = []
     try {
-      const { data: resultsData, error: resultsError } = await supabase
-        .from('test_results')
-        .select('*')
+      // Attempt to fetch nested structure. Adjust field names gracefully.
+      const { data: samplesData, error: samplesError } = await supabase
+        .from('samples')
+        .select(`
+          id,
+          order_id,
+          kit_code,
+          tested_at,
+          results (
+            id,
+            hormone_type,
+            notes,
+            result_values (
+              id,
+              value,
+              unit,
+              reference_range_min,
+              reference_range_max,
+              tested_at
+            )
+          )
+        `)
         .in('order_id', orderIds)
         .order('tested_at', { ascending: false })
 
-      if (resultsError) {
-        console.error('Error fetching test results:', resultsError)
-        // If test_results table doesn't exist, just return empty results
-        results = []
-      } else {
-        results = resultsData || []
+      if (samplesError) {
+        console.error('Error fetching samples/results:', samplesError)
       }
+
+      const flattened: any[] = []
+      ;(samplesData || []).forEach((sample: any) => {
+        const sampleOrderId = sample.order_id
+        const sampleKitCode = sample.kit_code || null
+        const sampleTestedAt = sample.tested_at || null
+        ;(sample.results || []).forEach((res: any) => {
+          const hormoneType = res.hormone_type || 'unknown'
+          const notes = res.notes || null
+          ;(res.result_values || []).forEach((rv: any) => {
+            flattened.push({
+              order_id: sampleOrderId,
+              hormone_type: hormoneType,
+              result_value: rv.value ?? null,
+              unit: rv.unit ?? null,
+              reference_range_min: rv.reference_range_min ?? null,
+              reference_range_max: rv.reference_range_max ?? null,
+              tested_at: rv.tested_at || sampleTestedAt || null,
+              kit_code: sampleKitCode,
+              notes
+            })
+          })
+        })
+      })
+
+      results = flattened
     } catch (err) {
-      console.error('Exception fetching test results:', err)
+      console.error('Exception fetching results via new schema:', err)
       results = []
     }
 
