@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     if (assayIds.length > 0) {
       const { data: assays, error: assaysErr } = await supabase
         .from('assays')
-        .select('id, name')
+        .select('id, display_name, ref_low, ref_high')
         .in('id', assayIds)
 
       if (assaysErr) {
@@ -152,11 +152,11 @@ export async function GET(request: NextRequest) {
       const assay = assaysMap[rv.assay_id]
       return {
         order_id: orderId,
-        hormone_type: assay?.name || 'unknown',
+        hormone_type: assay?.display_name || 'unknown',
         result_value: rv.value ?? null,
         unit: rv.unit ?? null,
-        reference_range_min: rv.reference_range_min ?? null,
-        reference_range_max: rv.reference_range_max ?? null,
+        reference_range_min: rv.reference_range_min ?? assay?.ref_low ?? null,
+        reference_range_max: rv.reference_range_max ?? assay?.ref_high ?? null,
         tested_at: rv.tested_at || sample?.received_at_lab || null,
         kit_code: kitCode,
         notes: result?.notes || null,
