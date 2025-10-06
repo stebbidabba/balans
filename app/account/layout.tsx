@@ -45,6 +45,13 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                       <div className="text-xs text-white/60">See your hormone trends over time.</div>
                     </span>
                   </Link>
+                  <Link href="/account/insights" className="group flex items-start gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">
+                    <span className="mt-[2px] text-white/70 group-hover:text-white">💡</span>
+                    <span>
+                      <div className="font-medium">Insights</div>
+                      <div className="text-xs text-white/60">Personalized guidance — coming soon.</div>
+                    </span>
+                  </Link>
                 </nav>
               </div>
             </aside>
