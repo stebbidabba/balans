@@ -74,6 +74,7 @@ export async function GET(request: NextRequest) {
     }
 
     const kitIdToCode: Record<string, string> = (kits || []).reduce((acc: any, k: any) => { acc[k.id] = k.kit_code; return acc }, {})
+    const kitIdToOrderId: Record<string, string> = (shipments || []).reduce((acc: any, s: any) => { acc[s.kit_id] = s.order_id; return acc }, {})
 
     const { data: samples, error: samplesErr } = await supabase
       .from('samples')
@@ -158,9 +159,9 @@ export async function GET(request: NextRequest) {
     const flattened = (resultValues || []).map((rv: any) => {
       const result = resultById[rv.result_id]
       const sample = result ? sampleById[result.sample_id] : null
-      const kitCode = sample ? kitIdToCode[sample.kit_id] || null : null
-      // Prefer result.order_id if present, else map via shipment/kit
-      const orderId = (result as any)?.order_id || (kitCode ? kitCodeToOrderId[kitCode] || null : null)
+      const kitCode = sample ? (kitIdToCode[sample.kit_id] || sample.sample_code || null) : null
+      // Prefer result.order_id if present, else map via shipment (kit_id -> order_id)
+      const orderId = (result as any)?.order_id || (sample ? kitIdToOrderId[sample.kit_id] || null : null)
       const assay = assaysMap[rv.assay_id]
       return {
         order_id: orderId,
