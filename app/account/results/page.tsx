@@ -124,6 +124,12 @@ export default async function AccountResultsPage() {
     }
   }
 
+  const isRangeStatus = (status?: string | null) => {
+    if (!status) return false
+    const s = status.toLowerCase()
+    return s === 'low' || s === 'normal' || s === 'high'
+  }
+
   const getHormoneDisplayName = (hormone: string) => {
     switch (hormone) {
       case 'testosterone': return 'Testosterone'
@@ -195,9 +201,9 @@ export default async function AccountResultsPage() {
                     <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/5 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-lg font-medium text-white">{getHormoneDisplayName(result.hormone_type)}</h3>
-                        {result.status && (
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
-                            {getStatusIcon(result.status)} {result.status.toUpperCase()}
+                        {isRangeStatus(result.status) && (
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status!.toLowerCase())}`}>
+                            {getStatusIcon(result.status!.toLowerCase())} {result.status!.toUpperCase()}
                           </span>
                         )}
                       </div>
