@@ -180,7 +180,22 @@ export default async function AccountResultsPage() {
       const key = String(result.order_id)
       if (!grouped[key]) {
         const order = orders.find(o => o.id === result.order_id)
-        if (order) grouped[key] = { order, results: [] }
+        if (order) {
+          grouped[key] = { order, results: [] }
+        } else {
+          // Fallback placeholder order so results still display even if orders list doesn't include this id
+          grouped[key] = {
+            order: {
+              id: key,
+              email: '',
+              status: 'completed',
+              total_amount: 0,
+              created_at: result.tested_at || new Date().toISOString(),
+              products: []
+            },
+            results: []
+          }
+        }
       }
       if (grouped[key]) grouped[key].results.push(result)
     })
