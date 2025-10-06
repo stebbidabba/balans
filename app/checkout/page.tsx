@@ -31,6 +31,9 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [creatingPayment, setCreatingPayment] = useState(false)
 
+  // Format ISK amounts for Icelandic users
+  const formatISK = (value: number): string => `${new Intl.NumberFormat('is-IS').format(value)} ISK`
+
   const productId = searchParams.get('product')
   const quantity = Number(searchParams.get('qty') || "1")
   const isFromCart = searchParams.get('cart') === 'true'
@@ -201,7 +204,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
         <Navigation />
         <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8">
             <div className="text-center mb-6">
               <h1 className="text-2xl font-semibold text-gray-900 mb-2">Payment</h1>
               <p className="text-gray-600">Add your payment method details below</p>
@@ -238,7 +241,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Payment Section */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8">
             <div className="mb-6">
               <h1 className="text-2xl font-semibold text-gray-900 mb-2">Payment</h1>
               <p className="text-gray-600">Add your payment method details below</p>
@@ -247,13 +250,13 @@ export default function CheckoutPage() {
             {/* Payment Methods */}
             <div className="mb-6">
               <div className="flex space-x-4 mb-4">
-                <button className="flex-1 p-3 border-2 border-blue-500 bg-blue-50 rounded-xl flex items-center justify-center space-x-2">
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <button className="flex-1 p-3 border-2 border-brand bg-brand/10 rounded-xl flex items-center justify-center space-x-2">
+                  <svg className="w-6 h-6 text-brand" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm2 2h12v2H6V8zm0 4h8v2H6v-2z"/>
                   </svg>
-                  <span className="font-medium text-blue-600">Card</span>
+                  <span className="font-medium text-brand">Card</span>
                 </button>
-                <button className="flex-1 p-3 border border-gray-300 rounded-xl flex items-center justify-center space-x-2 hover:border-gray-400 transition-colors">
+                <button className="flex-1 p-3 border border-white/20 bg-white/5 rounded-xl flex items-center justify-center space-x-2 hover:bg-white/10 transition-colors">
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -387,7 +390,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
@@ -397,7 +400,7 @@ export default function CheckoutPage() {
                     <h3 className="font-medium text-gray-900">{product.name.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</h3>
                     <p className="text-sm text-gray-600">Qty: {product.quantity}</p>
                   </div>
-                  <span className="font-medium text-gray-900">{product.price_isk * product.quantity} ISK</span>
+                  <span className="font-medium text-gray-900">{formatISK(product.price_isk * product.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -405,15 +408,15 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-200 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal:</span>
-                <span className="text-gray-900">{subtotal} ISK</span>
+                <span className="text-gray-900">{formatISK(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Tax:</span>
-                <span className="text-gray-900">{tax} ISK</span>
+                <span className="text-gray-900">{formatISK(tax)}</span>
               </div>
               <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-2">
                 <span>Total:</span>
-                <span>{total} ISK</span>
+                <span>{formatISK(total)}</span>
               </div>
             </div>
           </div>
