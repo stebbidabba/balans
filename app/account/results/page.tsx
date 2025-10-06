@@ -180,9 +180,14 @@ export default async function AccountResultsPage() {
   }
 
   const groupedResults = groupResultsByOrder()
-  console.log('[ResultsPage] orders:', (orders || []).map(o => o.id))
-  console.log('[ResultsPage] flattened count:', flattened.length, 'sample rows example:', flattened.slice(0, 3))
-  console.log('[ResultsPage] groupedResults count:', groupedResults.length, 'keys:', groupedResults.map(g => g.order.id))
+  console.log('[ResultsPage] orders count:', (orders || []).length)
+  console.log('[ResultsPage] orders ids:', (orders || []).map(o => o.id))
+  console.log('[ResultsPage] flattened count:', flattened.length)
+  console.log('[ResultsPage] flattened sample:', flattened.slice(0, 3))
+  console.log('[ResultsPage] sample order.id:', (orders && orders[0]?.id) || null)
+  console.log('[ResultsPage] sample flattened.order_id:', (flattened && flattened[0]?.order_id) || null)
+  console.log('[ResultsPage] groupedResults count:', groupedResults.length)
+  console.log('[ResultsPage] grouped order ids:', groupedResults.map(g => g.order.id))
 
   return (
     <section>
