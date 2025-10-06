@@ -132,6 +132,8 @@ export default async function AccountResultsPage() {
 
   const flattenedResults = flattened
   console.log('[DEBUG results]:', flattenedResults?.length || 0, 'first result order_id:', flattenedResults?.[0]?.order_id)
+  console.log('[DEBUG] Raw orders array:', JSON.stringify(((orders as any[]) || []).map((o: any) => ({ id: o.id, user_id: o.user_id })) || []))
+  console.log('[DEBUG] Raw flattened results:', JSON.stringify(((flattenedResults as any[]) || []).map((r: any) => ({ order_id: r.order_id, hormone: r.hormone_type })) || []))
 
   const getStatusColor = (status: string) => {
     switch (status) {
