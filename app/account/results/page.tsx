@@ -45,6 +45,7 @@ export default async function AccountResultsPage() {
     .order('created_at', { ascending: false })
 
   const orders: Order[] = (ordersRaw || []) as any
+  console.log('[DEBUG orders]:', orders?.length || 0, 'first order:', orders?.[0]?.id)
 
   // Samples joined to kits for kit_code
   const { data: samplesRaw } = await supabase
@@ -128,6 +129,9 @@ export default async function AccountResultsPage() {
       }).filter((r: any) => r.order_id)
     }
   }
+
+  const flattenedResults = flattened
+  console.log('[DEBUG results]:', flattenedResults?.length || 0, 'first result order_id:', flattenedResults?.[0]?.order_id)
 
   const getStatusColor = (status: string) => {
     switch (status) {
