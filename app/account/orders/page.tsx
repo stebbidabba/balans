@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase-client'
-import Navigation from '@/components/Navigation'
-import Footer from '@/components/Footer'
 import Link from 'next/link'
 
 interface Order {
@@ -79,68 +77,43 @@ export default function UserOrdersPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-white text-xl">Loading your orders...</div>
-        </div>
-        <Footer />
-      </div>
-    )
+    return <div className="text-white">Loading your orders...</div>
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="text-red-400 text-xl mb-4">{error}</div>
-            <Link href="/login" className="text-brand hover:opacity-80">
-              Go to Login
-            </Link>
-          </div>
-        </div>
-        <Footer />
+      <div className="text-center">
+        <div className="text-red-400 text-xl mb-4">{error}</div>
+        <Link href="/login" className="text-brand hover:opacity-80">Go to Login</Link>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-end to-bg-start">
-      <Navigation />
-      
-      {/* Background blur effects */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute -top-[10%] -left-[5%] w-[600px] h-[600px] bg-gradient-to-br from-brand/25 via-purple-500/15 to-blue-500/20 rounded-full blur-blob"></div>
-        <div className="absolute top-[20%] -right-[10%] w-[700px] h-[700px] bg-gradient-to-bl from-emerald-400/20 via-cyan-400/15 to-brand/25 rounded-full blur-blob"></div>
-      </div>
+    <section>
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white">My Orders</h1>
+          <p className="text-text-muted">Track your hormone test orders</p>
+        </div>
 
-      <section className="relative pt-32 pb-20">
-        <div className="max-w-4xl mx-auto px-6 md:px-8">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-white mb-4">My Orders</h1>
-            <p className="text-text-muted">Track your hormone test orders</p>
+        {/* Orders List */}
+        {orders.length === 0 ? (
+          <div className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-12 text-center border border-white/10">
+            <h3 className="text-xl font-semibold text-white mb-4">No orders yet</h3>
+            <p className="text-text-muted mb-6">Start your hormone testing journey</p>
+            <Link 
+              href="/shop"
+              className="inline-block px-8 py-3 bg-brand text-black font-semibold rounded-xl hover:opacity-90 transition-opacity"
+            >
+              Browse Tests
+            </Link>
           </div>
-
-          {/* Orders List */}
-          {orders.length === 0 ? (
-            <div className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-12 text-center border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-4">No orders yet</h3>
-              <p className="text-text-muted mb-6">Start your hormone testing journey</p>
-              <Link 
-                href="/shop"
-                className="inline-block px-8 py-3 bg-brand text-black font-semibold rounded-xl hover:opacity-90 transition-opacity"
-              >
-                Browse Tests
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {orders.map((order) => (
-                <div key={order.id} className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div key={order.id} className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                   {/* Order Header */}
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                     <div>
@@ -223,23 +196,20 @@ export default function UserOrdersPage() {
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* Back to Account */}
-          <div className="mt-8 text-center">
-            <Link 
-              href="/account"
-              className="inline-block px-6 py-3 border border-white/20 text-white font-medium rounded-xl hover:bg-white/10 transition-all"
-            >
-              ← Back to Account
-            </Link>
+            ))}
           </div>
+        )}
+
+        {/* Back to Account */}
+        <div className="mt-8">
+          <Link 
+            href="/account"
+            className="inline-block px-6 py-3 border border-white/20 text-white font-medium rounded-xl hover:bg-white/10 transition-all"
+          >
+            ← Back to Account
+          </Link>
         </div>
-      </section>
-      
-      <Footer />
-    </div>
+      </div>
+    </section>
   )
 }
