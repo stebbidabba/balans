@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
     if ((!resultsRows || resultsRows.length === 0)) {
       const alt = await supabase
         .from('results')
-        .select('id, sample_id, order_id, status')
+        .select('id, sample_id, order_id, status, created_at')
         .in('order_id', orderIds)
       if (!alt.error && alt.data) {
         resultsRows = alt.data
