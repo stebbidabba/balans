@@ -7,18 +7,17 @@ import Footer from '@/components/Footer'
 import Link from 'next/link'
 
 interface TestResult {
-  id: number
-  order_id: string
-  kit_code: string
+  id?: number | string
+  order_id: string | null
+  kit_code?: string | null
   hormone_type: string
-  result_value: number
-  unit: string
-  reference_range_min: number
-  reference_range_max: number
-  status: string
-  notes: string
-  tested_at: string
-  created_at: string
+  result_value: number | null
+  unit: string | null
+  reference_range_min: number | null
+  reference_range_max: number | null
+  status?: string | null
+  notes?: string | null
+  tested_at: string | null
 }
 
 interface Order {
@@ -164,20 +163,24 @@ export default function AccountResultsPage() {
                     <p className="text-text-muted">Tested on {new Date(results[0]?.tested_at || order.created_at).toLocaleDateString()}</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {results.map((result) => (
-                      <div key={result.id} className="bg-white/5 rounded-lg p-4">
+                    {results.map((result, idx) => (
+                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/5 rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="text-lg font-medium text-white">{getHormoneDisplayName(result.hormone_type)}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>{getStatusIcon(result.status)} {result.status.toUpperCase()}</span>
+                          {result.status && (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
+                              {getStatusIcon(result.status)} {result.status.toUpperCase()}
+                            </span>
+                          )}
                         </div>
                         <div className="mb-3">
-                          <div className="text-2xl font-bold text-brand">{result.result_value} {result.unit}</div>
+                          <div className="text-2xl font-bold text-brand">{result.result_value ?? '-'} {result.unit ?? ''}</div>
                         </div>
-                        <div className="mb-3 text-sm text-text-muted">Reference Range: {result.reference_range_min} - {result.reference_range_max} {result.unit}</div>
+                        <div className="mb-3 text-sm text-text-muted">Reference Range: {result.reference_range_min ?? '-'} - {result.reference_range_max ?? '-'} {result.unit ?? ''}</div>
                         <div className="mb-3 text-sm text-text-muted">{getHormoneDescription(result.hormone_type)}</div>
-                        {result.notes && (
+                        {result.notes ? (
                           <div className="pt-3 border-t border-white/10 text-sm text-text-muted"><strong>Lab Notes:</strong> {result.notes}</div>
-                        )}
+                        ) : null}
                       </div>
                     ))}
                   </div>
