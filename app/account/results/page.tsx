@@ -240,8 +240,8 @@ export default async function AccountResultsPage() {
                     </div>
                   ))}
                 </div>
-                {results[0]?.kit_code && (
-                  <div className="mt-6 pt-6 border-top border-white/10 text-sm text-text-muted">Kit Code: <span className="font-mono text-white">{results[0].kit_code}</span></div>
+                {group.results[0]?.kit_code && (
+                  <div className="mt-6 pt-6 border-top border-white/10 text-sm text-text-muted">Kit Code: <span className="font-mono text-white">{group.results[0].kit_code}</span></div>
                 )}
               </div>
             ))}
