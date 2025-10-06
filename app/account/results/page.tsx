@@ -127,7 +127,7 @@ export default async function AccountResultsPage() {
           notes: null,
           status: result?.status || null
         }
-      }).filter((r: any) => r.order_id)
+      })
     }
   }
 
