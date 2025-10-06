@@ -61,12 +61,10 @@ export default async function AccountResultsPage() {
 
   let flattened: TestResult[] = []
   if (sampleIds.length > 0) {
-    const allowedStatuses = ['ready', 'released', 'corrected']
     const { data: resultsRows } = await supabase
       .from('results')
       .select('id, sample_id, status')
       .in('sample_id', sampleIds)
-      .in('status', allowedStatuses)
 
     const resultIds = (resultsRows || []).map((r: any) => r.id)
     const sampleById = (samples || []).reduce((acc: any, s: any) => { acc[s.id] = s; return acc }, {})
