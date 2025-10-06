@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     const allowedStatuses = ['ready', 'released', 'corrected']
     let { data: resultsRows, error: resultsErr } = await supabase
       .from('results')
-      .select('id, sample_id, status')
+      .select('id, sample_id, order_id, status, created_at')
       .in('sample_id', sampleIds)
       .in('status', allowedStatuses)
 
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
     // 3) result_values for those results
     const { data: resultValues, error: rvErr } = await supabase
       .from('result_values')
-      .select('id, result_id, assay_id, value, unit, reference_range_min, reference_range_max, tested_at')
+      .select('id, result_id, assay_id, value, unit, created_at')
       .in('result_id', resultIds)
 
     if (rvErr) {
@@ -168,9 +168,9 @@ export async function GET(request: NextRequest) {
         hormone_type: assay?.display_name || 'unknown',
         result_value: rv.value ?? null,
         unit: rv.unit ?? null,
-        reference_range_min: rv.reference_range_min ?? assay?.ref_low ?? null,
-        reference_range_max: rv.reference_range_max ?? assay?.ref_high ?? null,
-        tested_at: rv.tested_at || sample?.received_at_lab || null,
+        reference_range_min: assay?.ref_low ?? null,
+        reference_range_max: assay?.ref_high ?? null,
+        tested_at: rv.created_at || result?.created_at || sample?.received_at_lab || null,
         kit_code: kitCode,
         notes: null,
         status: result?.status || null
