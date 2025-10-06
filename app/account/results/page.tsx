@@ -212,7 +212,7 @@ export default async function AccountResultsPage() {
                   <h2 className="text-xl font-semibold text-white mb-2">{group.title}</h2>
                   <p className="text-text-muted">Tested on {new Date(group.results[0]?.tested_at || new Date()).toLocaleDateString()}</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {group.results.map((result: TestResult, idx: number) => {
                     const v = result.result_value != null ? Number(result.result_value) : NaN
                     const low = result.reference_range_min != null ? Number(result.reference_range_min) : null
@@ -220,25 +220,25 @@ export default async function AccountResultsPage() {
                     const { label, status } = !isNaN(v) ? evaluateStatus(v, low, high) : { label: null, status: null }
                     const pct = !isNaN(v) ? computePercent(v, low, high) : 50
                     return (
-                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/90 text-gray-900 rounded-2xl p-6 shadow-sm">
+                      <div key={`${result.order_id || 'noorder'}-${result.hormone_type}-${result.tested_at || 'na'}-${idx}`} className="bg-white/90 text-gray-900 rounded-2xl p-5 shadow-sm">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h3 className="text-xl font-semibold leading-tight">{getHormoneDisplayName(result.hormone_type)}</h3>
+                            <h3 className="text-lg md:text-xl font-semibold leading-tight">{getHormoneDisplayName(result.hormone_type)}</h3>
                             {label && (
-                              <div className={`mt-1 text-base ${status === 'low' ? 'text-red-500' : status === 'high' ? 'text-red-500' : 'text-green-600'}`}>{label}</div>
+                              <div className={`mt-1 text-sm md:text-base ${status === 'low' ? 'text-red-500' : status === 'high' ? 'text-red-500' : 'text-green-600'}`}>{label}</div>
                             )}
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <div className="text-4xl font-bold leading-none">{isNaN(v) ? '-' : v}</div>
-                            <div className="text-base text-gray-500">{result.unit ?? ''}</div>
+                            <div className="text-3xl md:text-4xl font-bold leading-none">{isNaN(v) ? '-' : v}</div>
+                            <div className="text-sm md:text-base text-gray-500">{result.unit ?? ''}</div>
                           </div>
                         </div>
 
                         {/* Range bar */}
-                        <div className="mt-4 relative">
-                          <div className="h-3 rounded-full overflow-hidden" style={{background: 'linear-gradient(90deg, rgba(244,63,94,0.35) 0% 20%, rgba(34,197,94,0.35) 20% 80%, rgba(244,63,94,0.35) 80% 100%)'}}></div>
+                        <div className="mt-3 relative">
+                          <div className="h-2 rounded-full overflow-hidden" style={{background: 'linear-gradient(90deg, rgba(244,63,94,0.35) 0% 20%, rgba(34,197,94,0.35) 20% 80%, rgba(244,63,94,0.35) 80% 100%)'}}></div>
                           <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2" style={{left: `${pct}%`}}>
-                            <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-300 shadow" />
+                            <div className="w-5 h-5 rounded-full bg-white border-2 border-gray-300 shadow" />
                           </div>
                         </div>
 
