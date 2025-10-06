@@ -85,17 +85,25 @@ export async function GET(request: NextRequest) {
     }
 
     const sampleIds = (samples || []).map((s: any) => s.id)
-    if (sampleIds.length === 0) {
-      return NextResponse.json({ results: [], orders: orders || [] })
-    }
 
     // 2) results for those samples with allowed statuses
     const allowedStatuses = ['ready', 'released', 'corrected']
-    const { data: resultsRows, error: resultsErr } = await supabase
+    let { data: resultsRows, error: resultsErr } = await supabase
       .from('results')
       .select('id, sample_id, status')
       .in('sample_id', sampleIds)
       .in('status', allowedStatuses)
+
+    // Fallback: if no results via sample_ids, try results anchored by order_id directly
+    if ((!resultsRows || resultsRows.length === 0)) {
+      const alt = await supabase
+        .from('results')
+        .select('id, sample_id, order_id, status')
+        .in('order_id', orderIds)
+      if (!alt.error && alt.data) {
+        resultsRows = alt.data
+      }
+    }
 
     if (resultsErr) {
       console.error('Error fetching results:', resultsErr)
@@ -151,7 +159,8 @@ export async function GET(request: NextRequest) {
       const result = resultById[rv.result_id]
       const sample = result ? sampleById[result.sample_id] : null
       const kitCode = sample ? kitIdToCode[sample.kit_id] || null : null
-      const orderId = kitCode ? kitCodeToOrderId[kitCode] || null : null
+      // Prefer result.order_id if present, else map via shipment/kit
+      const orderId = (result as any)?.order_id || (kitCode ? kitCodeToOrderId[kitCode] || null : null)
       const assay = assaysMap[rv.assay_id]
       return {
         order_id: orderId,
