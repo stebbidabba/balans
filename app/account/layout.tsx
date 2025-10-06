@@ -17,10 +17,34 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                   <h2 className="text-white font-semibold text-lg">Account</h2>
                 </div>
                 <nav className="space-y-1">
-                  <Link href="/account/results" className="block px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">Results</Link>
-                  <Link href="/account/orders" className="block px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">Order Status</Link>
-                  <Link href="/account/transactions" className="block px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">Transactions</Link>
-                  <Link href="/account/charts" className="block px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">Charts</Link>
+                  <Link href="/account/results" className="group flex items-start gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">
+                    <span className="mt-[2px] text-white/70 group-hover:text-white">🧪</span>
+                    <span>
+                      <div className="font-medium">Results</div>
+                      <div className="text-xs text-white/60">View your hormone test results.</div>
+                    </span>
+                  </Link>
+                  <Link href="/account/orders" className="group flex items-start gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">
+                    <span className="mt-[2px] text-white/70 group-hover:text-white">🚚</span>
+                    <span>
+                      <div className="font-medium">Order Status</div>
+                      <div className="text-xs text-white/60">Track your sample shipment and processing.</div>
+                    </span>
+                  </Link>
+                  <Link href="/account/transactions" className="group flex items-start gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">
+                    <span className="mt-[2px] text-white/70 group-hover:text-white">🧾</span>
+                    <span>
+                      <div className="font-medium">Transactions</div>
+                      <div className="text-xs text-white/60">View past purchases or invoices.</div>
+                    </span>
+                  </Link>
+                  <Link href="/account/charts" className="group flex items-start gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-white/10 transition-colors">
+                    <span className="mt-[2px] text-white/70 group-hover:text-white">📈</span>
+                    <span>
+                      <div className="font-medium">Charts</div>
+                      <div className="text-xs text-white/60">See your hormone trends over time.</div>
+                    </span>
+                  </Link>
                 </nav>
               </div>
             </aside>
