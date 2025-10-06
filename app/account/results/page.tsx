@@ -50,31 +50,24 @@ export default async function AccountResultsPage() {
   console.log('=== ORDERS ===', orders)
   console.log('[DEBUG orders]:', orders?.length || 0, 'first order:', orders?.[0]?.id)
 
-  // Samples joined to kits for kit_code
-  const { data: samplesRaw } = await supabase
-    .from('samples')
-    .select('id, user_id, received_at_lab, kit_id, kits ( id, kit_code )')
-    .eq('user_id', user.id)
-
-  const samples = samplesRaw || []
-  const sampleIds = samples.map((s: any) => s.id)
-  const kitCodes: string[] = samples.map((s: any) => s.kits?.kit_code).filter(Boolean)
-
+  // Minimal path: orders -> results (by order) -> result_values -> assays
+  const orderIds = orders.map(o => o.id)
   let flattened: TestResult[] = []
-  if (sampleIds.length > 0) {
+  if (orderIds.length > 0) {
+    const allowedStatuses = ['ready', 'released', 'corrected']
     const { data: resultsRows } = await supabase
       .from('results')
-      .select('id, sample_id, status')
-      .in('sample_id', sampleIds)
+      .select('id, sample_id, order_id, status, created_at')
+      .in('order_id', orderIds)
+      .in('status', allowedStatuses)
 
     const resultIds = (resultsRows || []).map((r: any) => r.id)
-    const sampleById = (samples || []).reduce((acc: any, s: any) => { acc[s.id] = s; return acc }, {})
     const resultById = (resultsRows || []).reduce((acc: any, r: any) => { acc[r.id] = r; return acc }, {})
 
     if (resultIds.length > 0) {
       const { data: resultValues } = await supabase
         .from('result_values')
-        .select('id, result_id, assay_id, value, unit, reference_range_min, reference_range_max, tested_at')
+        .select('id, result_id, assay_id, value, unit, created_at')
         .in('result_id', resultIds)
 
       const assayIds = Array.from(new Set((resultValues || []).map((rv: any) => rv.assay_id).filter(Boolean)))
@@ -87,44 +80,19 @@ export default async function AccountResultsPage() {
         assaysMap = (assays || []).reduce((acc: any, a: any) => { acc[a.id] = a; return acc }, {})
       }
 
-      // Map kit_code -> order_id via kits -> shipments
-      let kitCodeToOrderId: Record<string, string> = {}
-      if (kitCodes.length > 0) {
-        const { data: kits } = await supabase
-          .from('kits')
-          .select('id, kit_code')
-          .in('kit_code', kitCodes)
-        const kitIds = (kits || []).map((k: any) => k.id)
-        const kitCodeById = (kits || []).reduce((acc: any, k: any) => { acc[k.id] = k.kit_code; return acc }, {})
-        if (kitIds.length > 0) {
-          const { data: shipments } = await supabase
-            .from('shipments')
-            .select('id, kit_id, order_id')
-            .in('kit_id', kitIds)
-          kitCodeToOrderId = (shipments || []).reduce((acc: any, s: any) => {
-            const code = kitCodeById[s.kit_id]
-            if (code) acc[code] = s.order_id
-            return acc
-          }, {})
-        }
-      }
-
       flattened = (resultValues || []).map((rv: any) => {
         const result = resultById[rv.result_id]
-        const sample = result ? sampleById[result.sample_id] : null
-        const kitCode = sample?.kits?.kit_code || null
-        const orderId = kitCode ? kitCodeToOrderId[kitCode] || null : null
         const assay = assaysMap[rv.assay_id]
         return {
-          order_id: orderId,
-          sample_id: result?.sample_id ?? null,
-          hormone_type: assay?.display_name || 'unknown',
+          order_id: result?.order_id || null,
+          sample_id: result?.sample_id || null,
+          hormone_type: assay?.display_name || 'Unknown',
           result_value: rv.value ?? null,
           unit: rv.unit ?? null,
-          reference_range_min: rv.reference_range_min ?? assay?.ref_low ?? null,
-          reference_range_max: rv.reference_range_max ?? assay?.ref_high ?? null,
-          tested_at: rv.tested_at || sample?.received_at_lab || null,
-          kit_code: kitCode,
+          reference_range_min: assay?.ref_low ?? null,
+          reference_range_max: assay?.ref_high ?? null,
+          tested_at: rv.created_at || result?.created_at || null,
+          kit_code: null,
           notes: null,
           status: result?.status || null
         }
