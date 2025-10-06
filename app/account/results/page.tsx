@@ -98,11 +98,13 @@ export default function AccountResultsPage() {
   const groupResultsByOrder = () => {
     const grouped: { [key: string]: { order: Order; results: TestResult[] } } = {}
     results.forEach(result => {
-      if (!grouped[result.order_id]) {
+      if (!result.order_id) return
+      const key = String(result.order_id)
+      if (!grouped[key]) {
         const order = orders.find(o => o.id === result.order_id)
-        if (order) grouped[result.order_id] = { order, results: [] }
+        if (order) grouped[key] = { order, results: [] }
       }
-      if (grouped[result.order_id]) grouped[result.order_id].results.push(result)
+      if (grouped[key]) grouped[key].results.push(result)
     })
     return Object.values(grouped)
   }
