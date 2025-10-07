@@ -166,33 +166,59 @@ export async function createPaymentAction(args: {
             .in('id', ids)
           if (dbErr) throw dbErr
           const priceMap: Record<string, number> = (dbProducts || []).reduce((acc: any, p: any) => { acc[p.id] = p.price_isk; return acc }, {})
-          const orderItems: any[] = []
-          let seq = 1
           for (const p of products) {
             const pid = p.id || p.product_id
             const qty = Number(p.quantity || 1)
             const price = Number(priceMap[pid] || 0)
             for (let i = 0; i < qty; i++) {
-              const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
-              orderItems.push({ order_id: orderId, product_id: pid, quantity: 1, unit_price_isk: price, total_isk: price, kit_code: code })
-              seq++
+              // Allocate a real kit from inventory
+              const { data: kit, error: kitError } = await supabase
+                .from('kits')
+                .select('id, kit_code')
+                .eq('product_id', pid)
+                .eq('status', 'in_stock')
+                .order('created_at', { ascending: true })
+                .limit(1)
+                .single()
+              if (kitError || !kit) {
+                throw new Error('No kits available in inventory for this product')
+              }
+              const { error: itemErr } = await supabase
+                .from('order_items')
+                .insert({ order_id: orderId, product_id: pid, quantity: 1, unit_price_isk: price, total_isk: price, kit_code: kit.kit_code })
+              if (itemErr) throw itemErr
+              const { error: updErr } = await supabase
+                .from('kits')
+                .update({ status: 'assigned' })
+                .eq('id', kit.id)
+              if (updErr) throw updErr
             }
-          }
-          if (orderItems.length) {
-            const { error: itemsErr } = await supabase.from('order_items').insert(orderItems)
-            if (itemsErr) console.log('Failed to create order items:', itemsErr.message)
           }
         } else if (productId) {
           const { data: p, error: pe } = await supabase.from('products').select('id, price_isk').eq('id', productId).single()
           if (!pe && p) {
-            const orderItems: any[] = []
-            let seq = 1
             for (let i = 0; i < quantity; i++) {
-              const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
-              orderItems.push({ order_id: orderId, product_id: p.id, quantity: 1, unit_price_isk: p.price_isk, total_isk: p.price_isk, kit_code: code })
-              seq++
+              const { data: kit, error: kitError } = await supabase
+                .from('kits')
+                .select('id, kit_code')
+                .eq('product_id', p.id)
+                .eq('status', 'in_stock')
+                .order('created_at', { ascending: true })
+                .limit(1)
+                .single()
+              if (kitError || !kit) {
+                throw new Error('No kits available in inventory for this product')
+              }
+              const { error: itemErr } = await supabase
+                .from('order_items')
+                .insert({ order_id: orderId, product_id: p.id, quantity: 1, unit_price_isk: p.price_isk, total_isk: p.price_isk, kit_code: kit.kit_code })
+              if (itemErr) throw itemErr
+              const { error: updErr } = await supabase
+                .from('kits')
+                .update({ status: 'assigned' })
+                .eq('id', kit.id)
+              if (updErr) throw updErr
             }
-            await supabase.from('order_items').insert(orderItems)
           }
         }
       }
