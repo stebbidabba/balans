@@ -279,7 +279,7 @@ export default function ShopPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-5xl md:text-6xl font-semibold leading-tight text-white mb-6">
               {t('shop_hormone_testing_kits')}
             </h1>
             <p className="text-lg text-text-muted max-w-2xl mx-auto">
