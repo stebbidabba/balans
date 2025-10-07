@@ -19,6 +19,7 @@ export default function ShopPage() {
   
   const handleAddToCart = (product: any) => {
     dispatch({ type: 'ADD_ITEM', payload: { product_id: product.id.toString() } })
+    dispatch({ type: 'OPEN_CART' })
   }
 
   useEffect(() => {

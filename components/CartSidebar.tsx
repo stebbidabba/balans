@@ -99,9 +99,9 @@ export default function CartSidebar() {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="text-sm text-text-muted mb-4">
-                  {t('total')}: ({state.items.length} {state.items.length === 1 ? t('item') : t('items')}) ${state.total.toFixed(2)}
-                </div>
+              <div className="text-sm text-text-muted mb-4">
+                {t('total')}: ({state.items.length} {state.items.length === 1 ? t('item') : t('items')}) {new Intl.NumberFormat('is-IS').format(computedTotal)} ISK
+              </div>
                 <p className="text-sm text-text-muted/70 mb-6">
                   Items in your bag are not reserved — check out now to make them yours.
                 </p>

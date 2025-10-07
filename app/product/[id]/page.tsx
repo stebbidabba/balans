@@ -276,6 +276,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   const handleAddToCart = () => {
     dispatch({ type: 'ADD_ITEM', payload: { product_id: id } })
+    dispatch({ type: 'OPEN_CART' })
   }
 
   return (
