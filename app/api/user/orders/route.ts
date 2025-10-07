@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
           id,
           quantity,
           unit_price,
+          unit_price_isk,
+          kit_code,
           products (
             name,
             description
@@ -46,7 +48,7 @@ export async function GET(request: NextRequest) {
           name: item.products?.name || 'Unknown Product',
           description: item.products?.description || '',
           quantity: item.quantity,
-          unit_price: item.unit_price
+          unit_price: item.unit_price_isk ?? item.unit_price
         }))
       } else {
         // Fallback: create a single product based on order total
@@ -84,7 +86,7 @@ export async function GET(request: NextRequest) {
       return {
         ...order,
         products: products,
-        kit_codes: generateKitCodes(order.id, products),
+        kit_codes: (order.order_items || []).map((it: any) => it.kit_code).filter(Boolean),
         results_uploaded: order.status === 'completed'
       }
     })
@@ -96,19 +98,4 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Generate mock kit codes for orders
-function generateKitCodes(orderId: string, products: any[]): string[] {
-  const codes: string[] = []
-  let kitIndex = 1
-  
-  products.forEach((product: any) => {
-    // Generate one kit code per quantity ordered
-    for (let i = 0; i < product.quantity; i++) {
-      const code = `KT-${orderId.slice(-6).toUpperCase()}-${String(kitIndex).padStart(2, '0')}`
-      codes.push(code)
-      kitIndex++
-    }
-  })
-  
-  return codes
-}
+// Removed mock kit code generation. Kit codes must come from DB via order_items.kit_code
