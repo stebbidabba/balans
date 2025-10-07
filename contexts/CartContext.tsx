@@ -84,8 +84,19 @@ const getInitialState = (): CartState => {
       const savedCart = localStorage.getItem('balans-cart')
       if (savedCart) {
         const parsed = JSON.parse(savedCart)
+        // Migrate any legacy items that used { id, name, price, image, quantity }
+        const migratedItems = Array.isArray(parsed.items)
+          ? parsed.items.map((it: any) => {
+              if (it && typeof it === 'object') {
+                if ('product_id' in it) return { product_id: String(it.product_id), quantity: Number(it.quantity || 1) }
+                if ('id' in it) return { product_id: String(it.id), quantity: Number(it.quantity || 1) }
+              }
+              return null
+            }).filter(Boolean)
+          : []
         return {
-          ...parsed,
+          items: migratedItems,
+          total: 0,
           isOpen: false // Always start with cart closed
         }
       }

@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
-import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
-import { notFound } from 'next/navigation'
 import { useCart } from '@/contexts/CartContext'
+import { createClient } from '@/lib/supabase-client'
+import { useEffect, useState } from 'react'
 
 interface Product {
   id: number
@@ -28,6 +28,7 @@ interface Product {
   benefits: string[]
 }
 
+// Legacy static copy used before DB hookup; keep as fallback only
 const products: Record<string, Product> = {
   '1': {
     id: 1,
@@ -186,8 +187,24 @@ const products: Record<string, Product> = {
 
 
 export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = products[params.id]
+  const [dbProduct, setDbProduct] = useState<any | null>(null)
+  const [loading, setLoading] = useState(true)
+  const id = params.id
   const { dispatch } = useCart()
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('products')
+          .select('id,name,description,price_isk,image_url')
+          .eq('id', id)
+          .single()
+        if (data) setDbProduct(data)
+      } finally { setLoading(false) }
+    })()
+  }, [id])
   
   const renderProductIcon = (name: string) => {
     const lower = String(name || '').toLowerCase()
@@ -254,12 +271,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     )
   }
   
-  if (!product) {
-    notFound()
-  }
+  const product = dbProduct || products[id]
+  if (!product) return null
 
   const handleAddToCart = () => {
-    dispatch({ type: 'ADD_ITEM', payload: { product_id: params.id } })
+    dispatch({ type: 'ADD_ITEM', payload: { product_id: id } })
   }
 
   return (
@@ -289,7 +305,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </div>
               
               <div className="text-4xl font-bold text-white">
-                {product.price}
+                {dbProduct ? `${dbProduct.price_isk} ISK` : product.price}
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
