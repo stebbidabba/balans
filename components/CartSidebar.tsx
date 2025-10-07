@@ -29,7 +29,22 @@ export default function CartSidebar() {
       const ids = state.items.map(i => i.product_id)
       console.log('CartSidebar: Fetching product IDs:', ids)
       
-      const { data, error } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
+      let { data, error } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
+      
+      // If nothing returned (likely legacy numeric ids), try name-based fallback mapping
+      if ((!data || data.length === 0) && ids.some(id => !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))) {
+        // Attempt to map common fallback products
+        const guesses = ['%testosterone%', '%stress%', '%complete%', '%women%']
+        const results: any[] = []
+        for (const like of guesses) {
+          const { data: d } = await supabase.from('products').select('id,name,price_isk,image_url').ilike('name', like).limit(1)
+          if (d && d.length) results.push(d[0])
+        }
+        if (results.length) {
+          data = results
+          error = null
+        }
+      }
       
       console.log('CartSidebar: Products fetched:', data, 'Error:', error)
       

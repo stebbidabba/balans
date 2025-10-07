@@ -17,10 +17,42 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  const handleAddToCart = (product: any) => {
-    console.log('Shop: Adding product to cart:', product.id, 'Type:', typeof product.id)
-    dispatch({ type: 'ADD_ITEM', payload: { product_id: String(product.id) } })
-    dispatch({ type: 'OPEN_CART' })
+  const handleAddToCart = async (product: any) => {
+    try {
+      let idToStore = String(product.id)
+      const looksLikeUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idToStore)
+
+      // If this came from fallback (numeric), try to resolve a real product UUID by name keywords
+      if (!looksLikeUuid) {
+        const supabase = createClient()
+        if (supabase) {
+          const name = String(product.name || '').toLowerCase()
+          let like = '%'
+          if (name.includes('testosterone')) like = '%testosterone%'
+          else if (name.includes('stress') || name.includes('energy')) like = '%stress%'
+          else if (name.includes('complete') || name.includes('panel')) like = '%complete%'
+          else if (name.includes('women')) like = '%women%'
+
+          const { data, error } = await supabase
+            .from('products')
+            .select('id,name')
+            .ilike('name', like)
+            .limit(1)
+
+          if (!error && data && data.length > 0) {
+            idToStore = data[0].id
+          }
+        }
+      }
+
+      console.log('Shop: Adding product to cart resolved id:', idToStore)
+      dispatch({ type: 'ADD_ITEM', payload: { product_id: idToStore } })
+      dispatch({ type: 'OPEN_CART' })
+    } catch (e) {
+      // Fallback: still add original id so user sees something; sidebar will handle fallback display
+      dispatch({ type: 'ADD_ITEM', payload: { product_id: String(product.id) } })
+      dispatch({ type: 'OPEN_CART' })
+    }
   }
 
   useEffect(() => {
