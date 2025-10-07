@@ -18,7 +18,8 @@ export default function ShopPage() {
   const [error, setError] = useState<string | null>(null)
   
   const handleAddToCart = (product: any) => {
-    dispatch({ type: 'ADD_ITEM', payload: { product_id: product.id.toString() } })
+    console.log('Shop: Adding product to cart:', product.id, 'Type:', typeof product.id)
+    dispatch({ type: 'ADD_ITEM', payload: { product_id: String(product.id) } })
     dispatch({ type: 'OPEN_CART' })
   }
 

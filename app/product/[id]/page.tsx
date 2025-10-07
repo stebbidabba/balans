@@ -275,7 +275,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (!product) return null
 
   const handleAddToCart = () => {
-    dispatch({ type: 'ADD_ITEM', payload: { product_id: id } })
+    console.log('Product page: Adding product to cart:', id, 'Type:', typeof id)
+    dispatch({ type: 'ADD_ITEM', payload: { product_id: String(id) } })
     dispatch({ type: 'OPEN_CART' })
   }
 
