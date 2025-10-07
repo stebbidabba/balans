@@ -36,7 +36,6 @@ export default function CartSidebar() {
         }
         
         const ids = state.items.map(i => i.product_id)
-        const ids = state.items.map(i => i.product_id)
         let { data, error } = await supabase
           .from('products')
           .select('id,name,price_isk')
