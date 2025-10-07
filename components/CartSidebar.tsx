@@ -15,9 +15,6 @@ export default function CartSidebar() {
   const [computedTotal, setComputedTotal] = useState<number>(0)
 
   useEffect(() => {
-    console.log('=== CART SIDEBAR FETCH DEBUG ===')
-    console.log('Cart items from state:', JSON.stringify(state.items, null, 2))
-    console.log('Number of items:', state.items.length)
     
     if (!state.items.length) {
       console.log('Cart is empty, clearing products and total')
@@ -39,22 +36,13 @@ export default function CartSidebar() {
         }
         
         const ids = state.items.map(i => i.product_id)
-        console.log('Product IDs to fetch:', ids)
-        console.log('ID types:', ids.map(id => `${id} (${typeof id})`))
-        
-        console.log('Executing Supabase query...')
+        const ids = state.items.map(i => i.product_id)
         let { data, error } = await supabase
           .from('products')
           .select('id,name,price_isk')
           .in('id', ids)
         
-        console.log('Supabase query completed')
-        console.log('  Error:', error)
-        console.log('  Data:', data)
-        console.log('  Rows returned:', data?.length || 0)
-        
         if (error || !data || data.length === 0) {
-          console.warn('⚠️ Retrying with per-id queries due to error/empty result from IN query')
           const rows: any[] = []
           for (const id of ids) {
             const { data: one, error: oneErr } = await supabase
@@ -62,50 +50,28 @@ export default function CartSidebar() {
               .select('id,name,price_isk')
               .eq('id', id)
               .limit(1)
-            if (oneErr) {
-              console.error('  ✗ Per-id fetch failed for', id, oneErr.message)
-            }
             if (one && one.length) {
               rows.push(one[0])
             }
           }
           data = rows
           error = null
-          console.log('Per-id fallback fetched', rows.length, 'rows')
         }
         
-        if (!data || data.length === 0) {
-          console.error('❌ Still no products after fallback. Cart IDs:', ids)
-          return
-        }
-        
-        console.log('✓ Products fetched successfully:', data.length, 'products')
+        if (!data || data.length === 0) return
         
         const map: Record<string, any> = {}
-        data.forEach((p: any) => { 
-          map[p.id] = p
-          console.log(`  ✓ Mapped: ${p.id} → ${p.name} (${p.price_isk} ISK)`) 
-        })
+        data.forEach((p: any) => { map[p.id] = p })
         
         setProdMap(map)
-        console.log('Products state updated, map has', Object.keys(map).length, 'entries')
         
         const total = state.items.reduce((sum, item) => {
           const product = map[item.product_id]
-          if (!product) {
-            console.warn(`  ⚠️ No product found for cart item with ID: ${item.product_id}`)
-            return sum
-          }
-          const lineTotal = product.price_isk * item.quantity
-          console.log(`  ${product.name} x${item.quantity} = ${lineTotal} ISK`)
-          return sum + lineTotal
+          if (!product) return sum
+          return sum + product.price_isk * item.quantity
         }, 0)
-        
-        console.log('✓ Computed total:', total, 'ISK')
         setComputedTotal(total)
-      } catch (err) {
-        console.error('❌ Unexpected error in fetchProducts:', err)
-      }
+      } catch {}
     }
 
     fetchProducts()
@@ -263,32 +229,7 @@ export default function CartSidebar() {
                 </svg>
               </button>
 
-              {/* Debug tools (temporary) */}
-              <div className="mt-3 space-y-2">
-                <button
-                  onClick={() => {
-                    console.log('=== MANUAL DEBUG ===')
-                    console.log('localStorage cart:', localStorage.getItem('balans-cart'))
-                    console.log('Current cart state:', state.items)
-                    console.log('Products loaded:', prodMap)
-                    console.log('Computed total:', computedTotal)
-                  }}
-                  className="w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded text-sm"
-                >
-                  🐛 Debug Cart (Check Console)
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm('Clear cart and reload page?')) {
-                      localStorage.removeItem('balans-cart')
-                      window.location.reload()
-                    }
-                  }}
-                  className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
-                >
-                  🗑️ Clear Cart & Reload
-                </button>
-              </div>
+              
             </div>
           )}
         </div>

@@ -18,11 +18,6 @@ export default function ShopPage() {
   const [error, setError] = useState<string | null>(null)
   
   const handleAddToCart = async (product: any) => {
-    console.log('=== ADD TO CART DEBUG ===')
-    console.log('Full product object:', product)
-    console.log('product.id:', product?.id)
-    console.log('product.id type:', typeof product?.id)
-    console.log('Is valid UUID?', /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(product?.id)))
     try {
       let idToStore = String(product.id)
       const looksLikeUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idToStore)
@@ -50,7 +45,7 @@ export default function ShopPage() {
         }
       }
 
-      console.log('Shop: Adding product to cart resolved id:', idToStore)
+      
       dispatch({ type: 'ADD_ITEM', payload: { product_id: idToStore } })
       dispatch({ type: 'OPEN_CART' })
     } catch (e) {
