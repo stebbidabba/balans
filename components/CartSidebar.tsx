@@ -43,7 +43,7 @@ export default function CartSidebar() {
         console.log('ID types:', ids.map(id => `${id} (${typeof id})`))
         
         console.log('Executing Supabase query...')
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('products')
           .select('id,name,description,price_isk,image_url')
           .in('id', ids)
@@ -53,16 +53,29 @@ export default function CartSidebar() {
         console.log('  Data:', data)
         console.log('  Rows returned:', data?.length || 0)
         
-        if (error) {
-          console.error('❌ Supabase query error:', error.message, error.details, error.hint)
-          return
+        if (error || !data || data.length === 0) {
+          console.warn('⚠️ Retrying with per-id queries due to error/empty result from IN query')
+          const rows: any[] = []
+          for (const id of ids) {
+            const { data: one, error: oneErr } = await supabase
+              .from('products')
+              .select('id,name,description,price_isk,image_url')
+              .eq('id', id)
+              .limit(1)
+            if (oneErr) {
+              console.error('  ✗ Per-id fetch failed for', id, oneErr.message)
+            }
+            if (one && one.length) {
+              rows.push(one[0])
+            }
+          }
+          data = rows
+          error = null
+          console.log('Per-id fallback fetched', rows.length, 'rows')
         }
         
         if (!data || data.length === 0) {
-          console.error('❌ No products returned from database!')
-          console.log('This means cart product IDs do not exist in products table')
-          console.log('Cart IDs:', ids)
-          console.log('ACTION: Run this SQL to inspect products: SELECT id, name FROM products WHERE active = true;')
+          console.error('❌ Still no products after fallback. Cart IDs:', ids)
           return
         }
         
