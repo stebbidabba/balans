@@ -30,26 +30,53 @@ export default function CartSidebar() {
       console.log('CartSidebar: Fetching product IDs:', ids)
       
       let { data, error } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
-      
+
+      const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)
+
       // If nothing returned (likely legacy numeric ids), try name-based fallback mapping
-      if ((!data || data.length === 0) && ids.some(id => !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))) {
-        // Attempt to map common fallback products
-        const guesses = ['%testosterone%', '%stress%', '%complete%', '%women%']
+      if ((!data || data.length === 0) && ids.some(id => !isUuid(id))) {
+        const guesses = [
+          { key: '1', like: '%testosterone%' },
+          { key: '2', like: '%stress%' },
+          { key: '3', like: '%complete%' },
+          { key: '4', like: '%women%' }
+        ]
         const results: any[] = []
-        for (const like of guesses) {
-          const { data: d } = await supabase.from('products').select('id,name,price_isk,image_url').ilike('name', like).limit(1)
-          if (d && d.length) results.push(d[0])
+        for (const g of guesses) {
+          // Only fetch if the legacy id is present in cart
+          if (ids.includes(g.key)) {
+            const { data: d } = await supabase
+              .from('products')
+              .select('id,name,price_isk,image_url')
+              .ilike('name', g.like)
+              .limit(1)
+            if (d && d.length) {
+              results.push({ legacyId: g.key, product: d[0] })
+            }
+          }
         }
         if (results.length) {
-          data = results
+          // Seed data with found products so we can compute totals
+          data = results.map(r => r.product)
           error = null
         }
       }
-      
+
       console.log('CartSidebar: Products fetched:', data, 'Error:', error)
-      
+
       const map: Record<string, any> = {}
       ;(data || []).forEach((p: any) => { map[p.id] = p })
+
+      // Also map legacy numeric ids to the best matched product for display/total
+      ids.forEach((id) => {
+        if (!isUuid(id) && !map[id]) {
+          const pickBy = (needle: string) => (data || []).find((p: any) => String(p.name || '').toLowerCase().includes(needle))
+          if (id === '1') { const m = pickBy('testosterone'); if (m) map[id] = m }
+          else if (id === '2') { const m = pickBy('stress') || pickBy('energy'); if (m) map[id] = m }
+          else if (id === '3') { const m = pickBy('complete') || pickBy('panel'); if (m) map[id] = m }
+          else if (id === '4') { const m = pickBy('women'); if (m) map[id] = m }
+        }
+      })
       setProdMap(map)
       
       console.log('CartSidebar: Product map:', map)
