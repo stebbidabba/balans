@@ -348,7 +348,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 <h3 className="text-lg font-semibold text-white">
                   {product.hormones.length > 1 ? 'Key Hormones Tested' : 'Hormone Tested'}
                 </h3>
-                {product.hormones.map((hormone, index) => (
+                {product.hormones.map((hormone: any, index: number) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-white font-medium">{hormone.name}</span>
