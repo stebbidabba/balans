@@ -386,7 +386,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {product.steps.map((step, index) => (
+            {product.steps.map((step: any, index: number) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 rounded-full bg-brand flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl font-bold text-black">
