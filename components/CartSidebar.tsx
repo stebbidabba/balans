@@ -45,7 +45,7 @@ export default function CartSidebar() {
         console.log('Executing Supabase query...')
         let { data, error } = await supabase
           .from('products')
-          .select('id,name,description,price_isk,image_url')
+          .select('id,name,price_isk')
           .in('id', ids)
         
         console.log('Supabase query completed')
@@ -59,7 +59,7 @@ export default function CartSidebar() {
           for (const id of ids) {
             const { data: one, error: oneErr } = await supabase
               .from('products')
-              .select('id,name,description,price_isk,image_url')
+              .select('id,name,price_isk')
               .eq('id', id)
               .limit(1)
             if (oneErr) {
