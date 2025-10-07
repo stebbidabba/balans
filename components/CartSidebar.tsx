@@ -107,7 +107,7 @@ export default function CartSidebar() {
                 </p>
                 
                 {state.items.map((item) => (
-                  <div key={item.id} className="flex gap-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                  <div key={item.product_id} className="flex gap-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
                     <div className="relative">
                       <img
                         src={prodMap[item.product_id]?.image_url || '/testkit.png'}
