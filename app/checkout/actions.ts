@@ -52,18 +52,30 @@ export async function createPaymentAction(args: {
       console.log('User account creation exception:', e);
     }
     
-    // Calculate total amount
+    // Calculate total amount using DB prices
     let totalAmount = 0;
     if (products && products.length > 0) {
-      totalAmount = products.reduce((total, product) => total + (product.price_isk * product.quantity), 0);
+      const ids = products.map((p: any) => p.id || p.product_id)
+      const { data: dbProducts, error: dbErr } = await supabase
+        .from('products')
+        .select('id, price_isk')
+        .in('id', ids)
+      if (dbErr) throw dbErr
+      const priceMap: Record<string, number> = (dbProducts || []).reduce((acc: any, p: any) => { acc[p.id] = p.price_isk; return acc }, {})
+      totalAmount = products.reduce((sum: number, p: any) => {
+        const pid = p.id || p.product_id
+        const qty = Number(p.quantity || 1)
+        const price = Number(priceMap[pid] || 0)
+        return sum + price * qty
+      }, 0)
     } else if (productId) {
-      // Fallback for single product
-      const fallbackProducts: any = {
-        '1': { price_isk: 12900 },
-        '2': { price_isk: 14400 },
-        '3': { price_isk: 19900 }
-      };
-      totalAmount = (fallbackProducts[productId]?.price_isk || 12900) * quantity;
+      const { data: p, error: pe } = await supabase
+        .from('products')
+        .select('id, price_isk')
+        .eq('id', productId)
+        .single()
+      if (pe || !p) throw pe || new Error('Product not found')
+      totalAmount = p.price_isk * quantity
     }
 
     // Try to create order in Supabase first (guest or authenticated)
@@ -145,109 +157,42 @@ export async function createPaymentAction(args: {
         orderId = order.id;
         console.log(`Order saved to Supabase: ${orderId} for ${email}`);
         
-        // Create order_items for each product
+        // Create order_items for each product using DB prices
         if (products && products.length > 0) {
-          const orderItems: any[] = []
-          
-          // Get product UUIDs from the products table
-          const { data: productData, error: productError } = await supabase
+          const ids = products.map((p: any) => p.id || p.product_id)
+          const { data: dbProducts, error: dbErr } = await supabase
             .from('products')
-            .select('id, sku')
-          
-          console.log('Product data:', productData)
-          console.log('Products from cart:', products)
-          
-          if (productError) {
-            console.log('Failed to fetch products:', productError.message)
-          } else {
-            // Create mapping from SKU -> UUID
-            const productMap: Record<string, string> = {}
-            productData.forEach((product: any) => {
-              productMap[product.sku] = product.id
-            })
-            
-            console.log('Product map:', productMap)
-            
-            let seq = 1
-            products.forEach((product: any) => {
-              console.log('Processing product:', product)
-              // Create one order_item record for each individual kit
-              for (let i = 0; i < product.quantity; i++) {
-                // Map numeric IDs from cart to SKUs used in DB
-                const numericToSku: any = { 1: 'TEST-001', 2: 'CORT-001', 3: 'COMP-001' }
-                const sku = numericToSku[product.id] || product.sku
-                const productUuid = productMap[sku]
-                console.log('Looking for product UUID:', product.id, 'found:', productUuid)
-                if (productUuid) {
-                  const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
-                  orderItems.push({
-                    order_id: orderId,
-                    product_id: productUuid,
-                    quantity: 1, // Each record represents 1 kit
-                    unit_price_isk: product.price_isk,
-                    total_isk: product.price_isk,
-                    kit_code: code
-                  })
-                  seq += 1
-                } else {
-                  console.log('No UUID found for product:', product.id)
-                }
-              }
-            });
-            
-            console.log('Order items to insert:', orderItems)
-            
-            if (orderItems.length > 0) {
-              const { error: itemsError } = await supabase
-                .from('order_items')
-                .insert(orderItems);
-              
-              if (itemsError) {
-                console.log('Failed to create order items:', itemsError.message);
-              } else {
-                console.log(`Created ${orderItems.length} order items for order ${orderId}`);
-              }
-            } else {
-              console.log('No order items to insert')
-            }
-          }
-        } else if (productId) {
-          // Single product fallback - map numeric to SKU, then fetch UUID
-          const numericToSku: any = { 1: 'TEST-001', 2: 'CORT-001', 3: 'COMP-001' }
-          const targetSku = numericToSku[productId]
-          const { data: productData, error: productError } = await supabase
-            .from('products')
-            .select('id, sku')
-            .eq('sku', targetSku)
-            .single()
-          
-          if (productError) {
-            console.log('Failed to fetch product:', productError.message)
-          } else {
+            .select('id, price_isk')
+            .in('id', ids)
+          if (dbErr) throw dbErr
+          const priceMap: Record<string, number> = (dbProducts || []).reduce((acc: any, p: any) => { acc[p.id] = p.price_isk; return acc }, {})
           const orderItems: any[] = []
           let seq = 1
+          for (const p of products) {
+            const pid = p.id || p.product_id
+            const qty = Number(p.quantity || 1)
+            const price = Number(priceMap[pid] || 0)
+            for (let i = 0; i < qty; i++) {
+              const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
+              orderItems.push({ order_id: orderId, product_id: pid, quantity: 1, unit_price_isk: price, total_isk: price, kit_code: code })
+              seq++
+            }
+          }
+          if (orderItems.length) {
+            const { error: itemsErr } = await supabase.from('order_items').insert(orderItems)
+            if (itemsErr) console.log('Failed to create order items:', itemsErr.message)
+          }
+        } else if (productId) {
+          const { data: p, error: pe } = await supabase.from('products').select('id, price_isk').eq('id', productId).single()
+          if (!pe && p) {
+            const orderItems: any[] = []
+            let seq = 1
             for (let i = 0; i < quantity; i++) {
-            const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
-            orderItems.push({
-                order_id: orderId,
-                product_id: productData.id,
-                quantity: 1, // Each record represents 1 kit
-              unit_price_isk: 12900, // Default price
-              total_isk: 12900,
-              kit_code: code
-              })
-            seq += 1
+              const code = `KT-${String(orderId).slice(-6).toUpperCase()}-${String(seq).padStart(2,'0')}`
+              orderItems.push({ order_id: orderId, product_id: p.id, quantity: 1, unit_price_isk: p.price_isk, total_isk: p.price_isk, kit_code: code })
+              seq++
             }
-            
-            const { error: itemsError } = await supabase
-              .from('order_items')
-              .insert(orderItems);
-            
-            if (itemsError) {
-              console.log('Failed to create order items:', itemsError.message);
-            } else {
-              console.log(`Created ${orderItems.length} order items for order ${orderId}`);
-            }
+            await supabase.from('order_items').insert(orderItems)
           }
         }
       }

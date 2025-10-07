@@ -69,53 +69,20 @@ export default function CheckoutPage() {
           setEmail(currentUser.email)
         }
 
-        // Load products based on source
-        let finalProducts: any[] = [];
-        
+        // Load products from DB
+        let finalProducts: any[] = []
         if (isFromCart) {
-          // Load all cart items
-          const fallbackProducts: any = {
-            '1': {
-              id: 1,
-              name: 'hormone_test_kit',
-              description: 'Complete hormone test kit',
-              price_isk: 12900,
-              quantity: cartState.items.find(item => item.id === '1')?.quantity || 0
-            },
-            '2': {
-              id: 2,
-              name: 'stress_test_kit',
-              description: 'Stress hormone test kit',
-              price_isk: 14400,
-              quantity: cartState.items.find(item => item.id === '2')?.quantity || 0
-            },
-            '3': {
-              id: 3,
-              name: 'comprehensive_test_kit',
-              description: 'Comprehensive hormone test kit',
-              price_isk: 19900,
-              quantity: cartState.items.find(item => item.id === '3')?.quantity || 0
-            }
-          }
-          
-          cartState.items.forEach(item => {
-            const product = fallbackProducts[item.id]
-            if (product && item.quantity > 0) {
-              finalProducts.push({ ...product, quantity: item.quantity })
-            }
-          })
-        } else {
-          // Load single product
-          const fallbackProducts: any = {
-            '1': { id: 1, name: 'hormone_test_kit', description: 'Complete hormone test kit', price_isk: 12900 },
-            '2': { id: 2, name: 'stress_test_kit', description: 'Stress hormone test kit', price_isk: 14400 },
-            '3': { id: 3, name: 'comprehensive_test_kit', description: 'Comprehensive hormone test kit', price_isk: 19900 }
-          }
-          
-          const product = fallbackProducts[String(productId)]
-          if (product) {
-            finalProducts = [{ ...product, quantity }]
-          }
+          const rows = cartState.items // [{ product_id, quantity }]
+          const ids = rows.map((r: any) => r.product_id)
+          const { data, error } = await supabase.from('products').select('id,name,description,price_isk').in('id', ids)
+          if (error) throw error
+          const map: Record<string, any> = {}
+          ;(data || []).forEach((p: any) => { map[p.id] = p })
+          finalProducts = rows.filter((r: any) => map[r.product_id]).map((r: any) => ({ ...map[r.product_id], quantity: r.quantity }))
+        } else if (productId) {
+          const { data, error } = await supabase.from('products').select('id,name,description,price_isk').eq('id', productId).single()
+          if (error || !data) { setError('No product selected'); setLoading(false); return }
+          finalProducts = [{ ...data, quantity }]
         }
 
         setProducts(finalProducts)

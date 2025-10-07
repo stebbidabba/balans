@@ -259,17 +259,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }
 
   const handleAddToCart = () => {
-    dispatch({
-      type: 'ADD_ITEM',
-      payload: {
-        id: params.id,
-        name: product.name,
-        price: parseFloat(product.price.replace('$', '')),
-        image: product.image,
-        variant: product.description
-      }
-    })
-    // Cart will not open automatically - user must click cart button
+    dispatch({ type: 'ADD_ITEM', payload: { product_id: params.id } })
   }
 
   return (

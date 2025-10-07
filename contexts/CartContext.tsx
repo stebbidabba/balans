@@ -3,13 +3,8 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react'
 
 export interface CartItem {
-  id: string
-  name: string
-  price: number
-  image: string
+  product_id: string
   quantity: number
-  size?: string
-  variant?: string
 }
 
 interface CartState {
@@ -19,9 +14,9 @@ interface CartState {
 }
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
+  | { type: 'ADD_ITEM'; payload: { product_id: string } }
   | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'UPDATE_QUANTITY'; payload: { product_id: string; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
@@ -30,44 +25,39 @@ type CartAction =
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => item.id === action.payload.id)
+      const existingItem = state.items.find(item => item.product_id === action.payload.product_id)
       
       if (existingItem) {
         const updatedItems = state.items.map(item =>
-          item.id === action.payload.id
+          item.product_id === action.payload.product_id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
-        const total = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        return { ...state, items: updatedItems, total }
+        return { ...state, items: updatedItems, total: 0 }
       } else {
-        const newItem = { ...action.payload, quantity: 1 }
+        const newItem = { product_id: action.payload.product_id, quantity: 1 }
         const updatedItems = [...state.items, newItem]
-        const total = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        return { ...state, items: updatedItems, total }
+        return { ...state, items: updatedItems, total: 0 }
       }
     }
     
     case 'REMOVE_ITEM': {
-      const updatedItems = state.items.filter(item => item.id !== action.payload)
-      const total = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-      return { ...state, items: updatedItems, total }
+      const updatedItems = state.items.filter(item => item.product_id !== action.payload)
+      return { ...state, items: updatedItems, total: 0 }
     }
     
     case 'UPDATE_QUANTITY': {
       if (action.payload.quantity <= 0) {
-        const updatedItems = state.items.filter(item => item.id !== action.payload.id)
-        const total = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-        return { ...state, items: updatedItems, total }
+        const updatedItems = state.items.filter(item => item.product_id !== action.payload.product_id)
+        return { ...state, items: updatedItems, total: 0 }
       }
       
       const updatedItems = state.items.map(item =>
-        item.id === action.payload.id
+        item.product_id === action.payload.product_id
           ? { ...item, quantity: action.payload.quantity }
           : item
       )
-      const total = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-      return { ...state, items: updatedItems, total }
+      return { ...state, items: updatedItems, total: 0 }
     }
     
     case 'CLEAR_CART':

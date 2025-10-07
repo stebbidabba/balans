@@ -18,17 +18,7 @@ export default function ShopPage() {
   const [error, setError] = useState<string | null>(null)
   
   const handleAddToCart = (product: any) => {
-    dispatch({
-      type: 'ADD_ITEM',
-      payload: {
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price_isk ? product.price_isk / 100 : parseFloat(product.price?.replace('$', '') || '0'),
-        image: product.image_url || product.image || '/testkit.png',
-        variant: product.description
-      }
-    })
-    // Cart will not open automatically - user must click cart button
+    dispatch({ type: 'ADD_ITEM', payload: { product_id: product.id.toString() } })
   }
 
   useEffect(() => {
