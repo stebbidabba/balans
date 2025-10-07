@@ -17,14 +17,32 @@ export default function CartSidebar() {
   useEffect(() => {
     (async () => {
       if (!state.items.length) { setProdMap({}); setComputedTotal(0); return }
+      
+      console.log('CartSidebar: Fetching products for cart items:', state.items)
       const supabase = createClient()
+      
+      if (!supabase) {
+        console.error('CartSidebar: Supabase client not initialized')
+        return
+      }
+      
       const ids = state.items.map(i => i.product_id)
-      const { data } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
+      console.log('CartSidebar: Fetching product IDs:', ids)
+      
+      const { data, error } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
+      
+      console.log('CartSidebar: Products fetched:', data, 'Error:', error)
+      
       const map: Record<string, any> = {}
       ;(data || []).forEach((p: any) => { map[p.id] = p })
       setProdMap(map)
+      
+      console.log('CartSidebar: Product map:', map)
+      
       const total = state.items.reduce((sum, r) => sum + ((map[r.product_id]?.price_isk || 0) * r.quantity), 0)
       setComputedTotal(total)
+      
+      console.log('CartSidebar: Computed total:', total)
     })()
   }, [state.items])
 
