@@ -15,77 +15,87 @@ export default function CartSidebar() {
   const [computedTotal, setComputedTotal] = useState<number>(0)
 
   useEffect(() => {
-    (async () => {
-      if (!state.items.length) { setProdMap({}); setComputedTotal(0); return }
-      
-      console.log('CartSidebar: Fetching products for cart items:', state.items)
-      const supabase = createClient()
-      
-      if (!supabase) {
-        console.error('CartSidebar: Supabase client not initialized')
-        return
-      }
-      
-      const ids = state.items.map(i => i.product_id)
-      console.log('CartSidebar: Fetching product IDs:', ids)
-      
-      let { data, error } = await supabase.from('products').select('id,name,price_isk,image_url').in('id', ids)
+    console.log('=== CART SIDEBAR FETCH DEBUG ===')
+    console.log('Cart items from state:', JSON.stringify(state.items, null, 2))
+    console.log('Number of items:', state.items.length)
+    
+    if (!state.items.length) {
+      console.log('Cart is empty, clearing products and total')
+      setProdMap({})
+      setComputedTotal(0)
+      return
+    }
 
-      const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)
-
-      // If nothing returned (likely legacy numeric ids), try name-based fallback mapping
-      if ((!data || data.length === 0) && ids.some(id => !isUuid(id))) {
-        const guesses = [
-          { key: '1', like: '%testosterone%' },
-          { key: '2', like: '%stress%' },
-          { key: '3', like: '%complete%' },
-          { key: '4', like: '%women%' }
-        ]
-        const results: any[] = []
-        for (const g of guesses) {
-          // Only fetch if the legacy id is present in cart
-          if (ids.includes(g.key)) {
-            const { data: d } = await supabase
-              .from('products')
-              .select('id,name,price_isk,image_url')
-              .ilike('name', g.like)
-              .limit(1)
-            if (d && d.length) {
-              results.push({ legacyId: g.key, product: d[0] })
-            }
+    const fetchProducts = async () => {
+      try {
+        const supabase = createClient()
+        
+        if (!supabase) {
+          console.error('❌ Supabase client is NULL')
+          console.log('Environment check:')
+          console.log('  NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '✓ SET' : '✗ MISSING')
+          console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✓ SET' : '✗ MISSING')
+          return
+        }
+        
+        const ids = state.items.map(i => i.product_id)
+        console.log('Product IDs to fetch:', ids)
+        console.log('ID types:', ids.map(id => `${id} (${typeof id})`))
+        
+        console.log('Executing Supabase query...')
+        const { data, error } = await supabase
+          .from('products')
+          .select('id,name,description,price_isk,image_url')
+          .in('id', ids)
+        
+        console.log('Supabase query completed')
+        console.log('  Error:', error)
+        console.log('  Data:', data)
+        console.log('  Rows returned:', data?.length || 0)
+        
+        if (error) {
+          console.error('❌ Supabase query error:', error.message, error.details, error.hint)
+          return
+        }
+        
+        if (!data || data.length === 0) {
+          console.error('❌ No products returned from database!')
+          console.log('This means cart product IDs do not exist in products table')
+          console.log('Cart IDs:', ids)
+          console.log('ACTION: Run this SQL to inspect products: SELECT id, name FROM products WHERE active = true;')
+          return
+        }
+        
+        console.log('✓ Products fetched successfully:', data.length, 'products')
+        
+        const map: Record<string, any> = {}
+        data.forEach((p: any) => { 
+          map[p.id] = p
+          console.log(`  ✓ Mapped: ${p.id} → ${p.name} (${p.price_isk} ISK)`) 
+        })
+        
+        setProdMap(map)
+        console.log('Products state updated, map has', Object.keys(map).length, 'entries')
+        
+        const total = state.items.reduce((sum, item) => {
+          const product = map[item.product_id]
+          if (!product) {
+            console.warn(`  ⚠️ No product found for cart item with ID: ${item.product_id}`)
+            return sum
           }
-        }
-        if (results.length) {
-          // Seed data with found products so we can compute totals
-          data = results.map(r => r.product)
-          error = null
-        }
+          const lineTotal = product.price_isk * item.quantity
+          console.log(`  ${product.name} x${item.quantity} = ${lineTotal} ISK`)
+          return sum + lineTotal
+        }, 0)
+        
+        console.log('✓ Computed total:', total, 'ISK')
+        setComputedTotal(total)
+      } catch (err) {
+        console.error('❌ Unexpected error in fetchProducts:', err)
       }
+    }
 
-      console.log('CartSidebar: Products fetched:', data, 'Error:', error)
-
-      const map: Record<string, any> = {}
-      ;(data || []).forEach((p: any) => { map[p.id] = p })
-
-      // Also map legacy numeric ids to the best matched product for display/total
-      ids.forEach((id) => {
-        if (!isUuid(id) && !map[id]) {
-          const pickBy = (needle: string) => (data || []).find((p: any) => String(p.name || '').toLowerCase().includes(needle))
-          if (id === '1') { const m = pickBy('testosterone'); if (m) map[id] = m }
-          else if (id === '2') { const m = pickBy('stress') || pickBy('energy'); if (m) map[id] = m }
-          else if (id === '3') { const m = pickBy('complete') || pickBy('panel'); if (m) map[id] = m }
-          else if (id === '4') { const m = pickBy('women'); if (m) map[id] = m }
-        }
-      })
-      setProdMap(map)
-      
-      console.log('CartSidebar: Product map:', map)
-      
-      const total = state.items.reduce((sum, r) => sum + ((map[r.product_id]?.price_isk || 0) * r.quantity), 0)
-      setComputedTotal(total)
-      
-      console.log('CartSidebar: Computed total:', total)
-    })()
+    fetchProducts()
   }, [state.items])
 
   if (!state.isOpen) return null
@@ -239,6 +249,33 @@ export default function CartSidebar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </button>
+
+              {/* Debug tools (temporary) */}
+              <div className="mt-3 space-y-2">
+                <button
+                  onClick={() => {
+                    console.log('=== MANUAL DEBUG ===')
+                    console.log('localStorage cart:', localStorage.getItem('balans-cart'))
+                    console.log('Current cart state:', state.items)
+                    console.log('Products loaded:', prodMap)
+                    console.log('Computed total:', computedTotal)
+                  }}
+                  className="w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded text-sm"
+                >
+                  🐛 Debug Cart (Check Console)
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm('Clear cart and reload page?')) {
+                      localStorage.removeItem('balans-cart')
+                      window.location.reload()
+                    }
+                  }}
+                  className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+                >
+                  🗑️ Clear Cart & Reload
+                </button>
+              </div>
             </div>
           )}
         </div>
