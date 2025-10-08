@@ -56,6 +56,8 @@ export default function UserOrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending_payment': return 'bg-gray-200 text-gray-800'
+      case 'paid': return 'bg-blue-100 text-blue-800'
       case 'confirmed': return 'bg-blue-100 text-blue-800'
       case 'shipped': return 'bg-yellow-100 text-yellow-800'
       case 'sample_received': return 'bg-purple-100 text-purple-800'
@@ -67,6 +69,8 @@ export default function UserOrdersPage() {
 
   const getStatusMessage = (status: string) => {
     switch (status) {
+      case 'pending_payment': return 'Awaiting payment confirmation'
+      case 'paid': return 'Payment received, preparing your test kit'
       case 'confirmed': return 'Order confirmed, preparing your test kit'
       case 'shipped': return 'Test kit shipped, check your email for tracking'
       case 'sample_received': return 'Sample received, analysis in progress'
