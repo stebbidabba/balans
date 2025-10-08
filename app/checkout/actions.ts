@@ -273,3 +273,16 @@ export async function sendPostPaymentEmails(email: string) {
     console.error('Failed to send account ready email:', e);
   }
 }
+
+export async function markOrderPaid(orderId: string) {
+  try {
+    if (!orderId) return;
+    const supabase = supabaseAdmin();
+    await supabase
+      .from('orders')
+      .update({ status: 'paid' })
+      .eq('id', orderId);
+  } catch (e) {
+    console.error('Failed to mark order paid:', e);
+  }
+}

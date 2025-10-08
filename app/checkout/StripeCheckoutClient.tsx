@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { sendPostPaymentEmails } from "./actions";
+import { sendPostPaymentEmails, markOrderPaid } from "./actions";
 
 // Mock Stripe for development - in production, use real Stripe keys
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_mock_key";
@@ -29,6 +29,7 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       await new Promise(resolve => setTimeout(resolve, 2000));
       setPaymentSuccess(true);
       setIsProcessing(false);
+      try { await markOrderPaid(orderId) } catch {}
       
       // Send emails after successful payment
       if (email) {
@@ -45,7 +46,7 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       return;
     }
     
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: { 
         return_url: `${window.location.origin}/orders/${orderId}` 
@@ -58,6 +59,7 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       setMsg(error.message || "Payment error");
     } else {
       setPaymentSuccess(true);
+      try { await markOrderPaid(orderId) } catch {}
       
       // Send emails after successful payment
       if (email) {
