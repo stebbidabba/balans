@@ -46,7 +46,7 @@ function PaymentForm({ clientSecret, orderId, email }: { clientSecret: string; o
       return;
     }
     
-    const { error, paymentIntent } = await stripe.confirmPayment({
+    const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: { 
         return_url: `${window.location.origin}/orders/${orderId}` 
