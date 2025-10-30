@@ -4,7 +4,7 @@ export default function ComingSoon() {
       <div className="max-w-xl w-full text-center">
         <div className="mb-8 flex items-center justify-center">
           <img
-            src="/whitelogo4x.png"
+            src="/whitelogo4x.png?v=2"
             alt="Balans logo"
             className="h-12 w-auto opacity-80"
           />
