@@ -58,7 +58,7 @@ export default function Footer() {
                   <div className="flex items-center">
                     <a href="/" className="hover:opacity-80 transition-opacity">
                       <img 
-                        src="/whitelogo4x.png?v=2" 
+                        src="/whitelogo4x_v2.png" 
                         alt="Balans" 
                         className="h-8 w-auto cursor-pointer"
                       />
