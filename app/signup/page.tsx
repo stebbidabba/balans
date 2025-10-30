@@ -72,7 +72,7 @@ export default function SignUpPage() {
           <div className="text-center mb-8">
             <a href="/" className="inline-block hover:opacity-80 transition-opacity">
               <img 
-                src="/logo4x.png" 
+                src="/whitelogo4x.png" 
                 alt="Balans" 
                 className="h-12 w-auto mx-auto"
               />
@@ -281,7 +281,7 @@ export default function SignUpPage() {
           <div className="text-center mt-8">
             <div className="flex items-center justify-center">
               <img 
-                src="/logo4x.png" 
+                src="/whitelogo4x.png" 
                 alt="Balans" 
                 className="h-6 w-auto opacity-80"
               />

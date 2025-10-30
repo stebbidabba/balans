@@ -42,7 +42,7 @@ export default function Navigation() {
           <div className="flex items-center">
             <a href="/" className="flex items-center hover:opacity-80 transition-opacity">
               <img 
-                src="/logo4x.png" 
+                src="/whitelogo4x.png" 
                 alt="Balans" 
                 className="h-8 w-auto cursor-pointer"
               />
